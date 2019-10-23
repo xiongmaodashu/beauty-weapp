@@ -1,0 +1,62 @@
+<template>
+    <view class="page__bd">
+        <view class="weui-panel__bd">
+            <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                <view class="weui-media-box__title">湖州倍美医疗美容会所</view>
+                <view class="weui-media-box__desc">申请获取您的公开信息（昵称、头像等）</view>
+            </view>
+        </view>
+        <view class="weui-panel__bd">
+            <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindgetuserinfo">授权获取头像昵称</button>
+        </view>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+
+  export default class User extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的'
+    }
+    data = {
+      loggedIn: false,
+      canIUse: wx.canIUse('button.open-type.getUserInfo')
+    }
+    onLoad() {
+      wx.getSetting({
+        success(res) {
+          if (res.authSetting['scope.userInfo']) {
+            wx.getUserInfo({
+              success: function(res) {
+                console.log(res.encryptedData)
+              }
+            })
+          }
+        }
+      })
+    }
+    async bindgetuserinfo(e) {
+    //   console.log(e.detail.userInfo)
+      let params = {
+        iv: e.detail.iv,
+        encryptedData: e.detail.encryptedData
+      }
+
+      let loginData = await wepy.login()
+      params.code = loginData.code
+      let authResponse = await api.request({
+        url: 'weapp/bind',
+        data: params,
+        method: 'POST'
+      })
+
+      if (authResponse.statusCode === 201) {
+        wepy.setStorageSync('access_token', authResponse.data.access_token)
+        wepy.setStorageSync('access_token_expired_at', new Date().getTime() + authResponse.data.expires_in * 1000)
+        wepy.navigateBack()
+      }
+    }
+  }
+</script>
