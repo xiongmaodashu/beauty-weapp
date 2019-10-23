@@ -1,0 +1,150 @@
+<style lang="less">
+  .address {
+    height: 3.8em;
+  }
+  .error-message {
+    color: #E64340;
+  }
+</style>
+<template>
+  <view class="page">
+    <view class="page__bd">
+      <form bindsubmit="submit">
+        <!-- 填写姓名 -->
+        <view class="weui-cells__title">姓名</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__bd">
+              <input class="weui-input" placeholder="请输入姓名" name="name" value="{{ user.name }}" />
+            </view>
+            <view wx:if="{{ errors.name }}" class="weui-cell__ft">
+              <icon type="warn" size="23" color="#E64340"></icon>
+            </view>
+          </view>
+        </view>
+        <!-- 姓名错误信息 -->
+        <view wx:if="{{ errors.name }}" class="weui-cells__tips error-message">{{ errors.name[0] }}</view>
+
+        <!-- 填写邮箱 -->
+        <view class="weui-cells__title">邮箱</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__bd">
+              <input class="weui-input" placeholder="请输入邮箱" name="email" value="{{ user.email }}" />
+            </view>
+            <view wx:if="{{ errors.email }}" class="weui-cell__ft">
+              <icon type="warn" size="23" color="#E64340"></icon>
+            </view>
+          </view>
+        </view>
+        <!-- 邮箱错误信息 -->
+        <view wx:if="{{ errors.email }}" class="weui-cells__tips error-message">{{ errors.email[0] }}</view>
+
+        <!-- 填写邮箱 -->
+        <view class="weui-cells__title">地址</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+            <view class="weui-cell__bd">
+              <textarea class="weui-textarea address" placeholder="请输入地址" 
+              name="address" value="{{ user.address }}" />
+            </view>
+            <view wx:if="{{ errors.address }}" class="weui-cell__ft">
+              <icon type="warn" size="23" color="#E64340"></icon>
+            </view>
+          </view>
+        </view>
+        <!-- 邮箱错误信息 -->
+        <view wx:if="{{ errors.address }}" class="weui-cells__tips error-message">{{ errors.address[0] }}</view>
+
+        <!-- 填写邮箱 -->
+        <view class="weui-cells__title">生日</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell">
+            <view class="weui-cell__bd">
+              <picker class="weui-btn" mode="date" value="{{date}}" start="1970-01-01" end="2019-10-01" @change="bindDateChange">
+                   <view class="picker weui-input">
+                        {{date}}
+                    </view>
+              </picker>
+            </view>
+            <view wx:if="{{ errors.birthday }}" class="weui-cell__ft">
+              <icon type="warn" size="23" color="#E64340"></icon>
+            </view>
+          </view>
+        </view>
+        <!-- 邮箱错误信息 -->
+        <view wx:if="{{ errors.birthday }}" class="weui-cells__tips error-message">{{ errors.birthday[0] }}</view>
+
+        <!-- 提交表单 -->
+        <view class="weui-btn-area">
+          <button class="weui-btn" type="primary" formType="submit">修改</button>
+        </view>
+      </form>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+
+  export default class UserEdit extends wepy.page {
+    config = {
+      navigationBarTitleText: '修改个人信息'
+    }
+    data = {
+        user: null,
+        date: null,
+        errors: null
+    }
+    async onShow() {
+      // 获取当前用户信息
+      this.user = await this.$parent.getCurrentUser()
+      this.$apply()
+      this.date = this.user.birthday
+    }
+    async submit (e) {
+      this.errors = null
+      let userData = e.detail.value
+      userData.birthday = this.date
+      try {
+        let editResponse = await api.authRequest({
+          url: 'user',
+          method: 'PUT',
+          data: e.detail.value
+        })
+
+        if (editResponse.statusCode === 422) {
+          this.errors = editResponse.data.errors
+          this.$apply()
+          console.log(this.errors.email)
+        }
+
+        if (editResponse.statusCode === 200) {
+          this.user = editResponse.data
+          wepy.setStorageSync('user', editResponse.data)
+          this.$apply()
+
+          wepy.showToast({
+            title: '修改成功',
+            icon: 'success',
+            duration: 2000
+          })
+        }
+      } catch (err) {
+          console.log(err)
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+        })
+      }
+    }
+    methods = {
+        bindDateChange: function(e) {
+            console.log('picker发送选择改变，携带值为', e.detail.value)
+            this.date = e.detail.value
+        },
+    }
+    
+  }
+</script>

@@ -2,7 +2,7 @@
   <view class="page">
     <view class="page__bd" >
       <view class="weui-cells weui-cells_after-title">
-        <navigator class="weui-cell" wx:if="{{ user }}" url>
+        <navigator class="weui-cell" wx:if="{{ user }}" url="/pages/users/edit">
           <view class="weui-cell__hd avatar-wrap">
             <image class="avatar" src="{{ user.avatar }}" style="width:100px;height:100px"/>
           </view>
