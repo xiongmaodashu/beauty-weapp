@@ -1,0 +1,1 @@
+wepy --watch --no-cache

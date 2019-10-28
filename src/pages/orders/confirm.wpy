@@ -1,0 +1,108 @@
+<template>
+<view class="page__bd">
+    <view class="weui-article">
+        <view class="weui-article__p">
+            <image src="{{ item.thumbnail }}" />
+        </view>
+        <view class="weui-article__p">
+            预约项目：{{ item.name }}
+        </view>
+        <view class="weui-article__p">
+            预约日期：{{ order_date }}
+        </view>
+        <view class="weui-article__p">
+            预约时间：{{ order_time }}
+        </view>
+        <view class="weui-article__p">
+            <button wx:if="{{ order_id }}" @tap="update">确认修改</button>
+            <button wx:else @tap="update">确认预约</button>
+        </view>
+    </view>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+
+export default class OrderConfirm extends wepy.page {
+    data = {
+        item: null,
+        shop_id: null,
+        order_date: null,
+        order_time: null,
+        order_id: null
+    }
+    async getItem(id) {
+        try {
+            let itemResponse = await api.request({
+                url: 'items/' + id,
+            })
+            let item = itemResponse.data
+            this.item = item
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+
+    async submit() {
+        let params={}
+        params.item_id = this.item.id
+        params.shop_id = this.shop_id
+        params.order_date = this.order_date
+        params.order_time = this.order_time
+        try {
+            let orderResponse = await api.authRequest({
+                url: "orders",
+                method: "post",
+                data: params
+            })
+            if (orderResponse.statusCode == 200) {
+                console.log(orderResponse.data)
+            }
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+
+    async update() {
+        let params={}
+        params.order_date = this.order_date
+        params.order_time = this.order_time
+        try {
+            let orderResponse = await api.authRequest({
+                url: 'orders/' + this.order_id,
+                method: 'PUT',
+                data: params
+            })
+            if (orderResponse.statusCode == 200) {
+                console.log(orderResponse.data)
+            }
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+
+    }
+
+    onLoad(options) {
+        this.getItem(options.item_id)
+        this.order_date = options.order_date
+        this.order_time = options.order_time
+        this.shop_id = options.shop_id
+        this.order_id = options.order_id
+    }
+}
+</script>

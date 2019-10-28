@@ -1,0 +1,145 @@
+<style>
+  .bg-grey {
+    background:#bfbfbf;
+  }
+  .bg-white {
+    background: #ffffff;
+  }
+  .index-nav {
+    margin:4px;
+    padding:5px;
+    text-align: center;
+  }
+  .index-nav-title {
+    font-size:0.75em;
+  }
+  .item-box {
+    width:49%;
+    height:250px;
+    float:left;
+    overflow:hidden;
+    margin-bottom:5px;
+    box-shadow: 1px 1px 2px #BCBAC2;
+  }
+</style>
+<template>
+<view class="page__bd">
+  <view class="weui-search-bar">
+      <view class="weui-search-bar__form">
+          <view class="weui-search-bar__box">
+              <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+              <input type="text" class="weui-search-bar__input" placeholder="搜索" value="{{inputVal}}" focus="{{inputShowed}}" bindinput="inputTyping" />
+              <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
+                  <icon type="clear" size="14"></icon>
+              </view>
+          </view>
+          <label class="weui-search-bar__label" hidden="{{inputShowed}}" bindtap="showInput">
+              <icon class="weui-icon-search" type="search" size="14"></icon>
+              <view class="weui-search-bar__text">搜索</view>
+          </label>
+      </view>
+      <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
+  </view>
+  <view style="height:15em;overflow:hidden">
+    <image src="/images/banner02.jpg" style="width:100%;max-height:100%;" />
+  </view>
+
+  <view class="weui-flex">
+      <view class="weui-flex__item">
+        <navigator class="index-nav" url="">
+          <image src="/images/shop.png" style="width:50px;height:50px;" />
+          <view class="index-nav-title">品牌介绍</view>
+        </navigator>
+      </view>
+       <view class="weui-flex__item">
+        <navigator class="index-nav" url="">
+          <image src="/images/tel.png" style="width:50px;height:50px;" />
+          <view class="index-nav-title">联系我们</view>
+        </navigator>
+      </view>
+       <view class="weui-flex__item">
+        <navigator class="index-nav" url="">
+          <image src="/images/order.png" style="width:50px;height:50px;" />
+          <view class="index-nav-title">在线预约</view>
+        </navigator>
+      </view>
+       <view class="weui-flex__item">
+        <navigator class="index-nav" url="">
+          <image src="/images/location.png" style="width:50px;height:50px;" />
+          <view class="index-nav-title">门店导航</view>
+        </navigator>
+      </view>
+  </view>
+  <view class="weui-flex">
+      <view class="weui-flex__item"><view class="placeholder">全部项目</view></view>
+  </view>
+
+  <view>
+    <repeat for="{{ items }}" key="id" index="index" item="item">
+      <view class="item-box">
+        <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+          <view style="width:100%;">
+            <image src="{{ item.thumbnail }}" style="width:100%;height:200px" />
+            <view style="width:100%;text-align:center">{{ item.name }}</view>
+          </view>
+        </navigator>
+      </view>
+    </repeat>
+  </view>
+
+</view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '@/utils/api'
+
+export default class Index extends wepy.page {
+      data = {
+        inputShowed: false,
+        inputVal: '',
+        items: [],
+        page: 1
+      };
+
+      async getItems(page = 1) {
+        try {
+          let itemsResponse = await api.request({
+            url: 'items',
+            data: {
+              page: page,
+              include: 'item_category'
+            }
+          })
+          let items = itemsResponse.data.data
+          this.items = this.items.concat(items)
+          this.$apply()
+        } catch (err) {
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
+        }
+      }
+
+      async onLoad() {
+        this.getItems()
+      }
+
+      methods = {
+        showInput () {
+          this.inputShowed = true
+        },
+        hideInput () {
+          this.inputVal = ''
+          this.inputShowed = false
+        },
+        clearInput () {
+          this.inputVal = ''
+        },
+        inputTyping (e) {
+          this.inputVal = e.detail.value
+        }
+      }
+    }
+</script>

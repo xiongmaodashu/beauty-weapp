@@ -1,0 +1,201 @@
+<style lang="less">
+    .orderable_date {
+        width:100px;
+        height:70px;
+        line-height: 35px;
+        border: 1px solid #0cc0ba;
+        border-radius: 5px;
+        margin: 0 3px;
+        padding:0 8px;
+        display: inline-block;
+    }
+    .orderable_date.active {
+        background: #0cc0ba;
+        color: #ffffff;
+    }
+    .orderable_date view {
+        text-align: center;
+    }
+    .orderable_time {
+        width:25%;
+        height: 50px;
+        line-height: 50px;
+        padding:0 4px;
+        margin-bottom:8px;
+        display: inline-block;
+        box-sizing: border-box;
+    }
+    .orderable_time .active {
+        background: #0cc0ba;
+        color: #ffffff;
+    }
+    .orderable_time .disabled {
+        background: #bababa;
+    }
+    .orderable_time view {
+        border: 1px solid #0cc0ba;
+        border-radius: 5px;
+        text-align: center;
+    }
+    .error-message {
+        color: #E64340;
+    }
+    .next-btn {
+        display: block;
+        width:100%;
+        height: 50px;
+        line-height: 50px;
+        background: #0cc0ba;
+        color: #ffffff;
+        text-align: center;
+        margin-top: 20px; 
+    }
+</style>
+
+<template>
+<view class="page">
+    <view class="weui-cells__title">预约日期
+        <text wx:if="{{ errors.order_date }}" class="weui-cells__tips error-message">{{ errors.order_date }}</text>
+    </view>
+    <view class="weui-cells weui-cells_after-title">
+        <scroll-view scroll-x="true" style=" white-space: nowrap; display: flex" >
+        <repeat for="{{ orderableDate }}" key="id" index="index" item="date">
+            <view class="orderable_date {{ dateIndex == index?'active':'' }}" data-index="{{ index }}" data-text="{{ date.date }}" bindtap="chooseDate">
+                <view>{{ date.date }}</view>
+                <view>{{ date.day }}</view>
+            </view>
+        </repeat>
+        </scroll-view>
+    </view>
+    
+
+    <view class="weui-cells__title">预约时间
+        <text wx:if="{{ errors.order_time }}" class="weui-cells__tips error-message">{{ errors.order_time }}</text>
+    </view>
+    <view class="weui-cells weui-cells_after-title">
+        <repeat for="{{ orderableTime.order_time }}" key="id" index="index" item="time">
+            <view class="orderable_time" data-index={{index}} data-text="{{ time.time }}" bindtap="chooseTime">
+                <view class="{{ timeIndex == index?'active':'' }}{{ time.passed ?'disabled':''}}">
+                    {{ time.time }}({{ time.count }}/{{ orderableTime.max_number }})
+                </view>
+            </view>
+        </repeat>
+    </view>
+
+    <view class="weui-cells__title">备注信息</view>
+    <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell">
+            <view class="weui-cell__bd">
+                <textarea class="weui-textarea" placeholder="请输入备注信息" style="height: 5.3em" />
+            </view>
+        </view>
+    </view>
+ 
+    <button class="next-btn"  @tap="nextStep">下一步</button>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+import util from '@/utils/util'
+
+export default class OrdersEdit extends wepy.page {
+    config = {
+        navigationBarTitleText: '项目预约'
+    }
+
+    data = {
+        shop_id: null,
+        item_id: null,
+        orderableDate: null,
+        orderableTime: null,
+        orderDate: null,
+        orderTime: null,
+        dateIndex: null,
+        timeIndex: null,
+        orderId: null,
+        errors: {}
+    }
+
+    async getOrderableDate(item_id, shop_id) {
+        try {
+            let orderableDateResponse = await api.request({
+                url: 'orders/order_date?item_id=' + item_id + '&shop_id=' + shop_id,
+            })
+            let orderableDate = orderableDateResponse.data
+            this.orderableDate = orderableDate
+            this.dateIndex = util.getIndex(this.orderDate, orderableDate, 'date')
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+    async getOrderableTime(item_id, shop_id, order_date) {
+        try {
+            let orderableTimeResponse = await api.request({
+                url: 'orders/order_time?item_id=' + item_id + '&shop_id=' + shop_id + '&order_date=' + order_date,
+            })
+            let orderableTime = orderableTimeResponse.data
+            var _this = this
+            orderableTime.order_time.forEach(function (time) {
+                time.passed = util.timePassed(_this.orderDate+ ' '+ time.time, util.currentTime(new Date()))
+            })
+            this.orderableTime = orderableTime
+            this.timeIndex = util.getIndex(this.orderTime, orderableTime.order_time, 'time')
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+    chooseDate(e) {
+        this.getOrderableTime(this.item_id, this.shop_id, e.currentTarget.dataset.text)
+        this.dateIndex = e.currentTarget.dataset.index
+        this.orderDate = e.currentTarget.dataset.text
+        this.orderTime = null
+        this.timeIndex = null
+        this.errors = {}
+    }
+    chooseTime(e) {
+        if (util.timePassed(this.orderDate + ' ' + e.currentTarget.dataset.text + ':00', util.currentTime(new Date()))) {
+            return false
+        }
+        this.timeIndex = e.currentTarget.dataset.index
+        this.orderTime = e.currentTarget.dataset.text
+        this.errors = {}
+        
+    }
+    async nextStep() {
+        if (this.orderTime === null) {
+            this.errors.order_time = '请选择预约时间'
+            return false
+        }
+        if (this.orderDate === null) {
+            this.errors.order_date = '请选择预约日期'
+            return false
+        }
+
+        wx.navigateTo({
+            url: "/pages/orders/confirm?shop_id="+this.shop_id+"&item_id="+this.item_id+"&order_date="+this.orderDate+"&order_time="+this.orderTime+"&order_id="+this.orderId
+        })
+    }
+
+    onLoad(options) {
+        this.getOrderableDate(options.item_id, options.shop_id)
+        this.getOrderableTime(options.item_id, options.shop_id, options.order_date)
+        this.shop_id = options.shop_id
+        this.item_id = options.item_id
+        this.orderDate = options.order_date
+        this.orderTime = options.order_time.substring(0, 5)
+        this.orderId = options.order_id
+    }
+}
+</script>

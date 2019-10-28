@@ -48,9 +48,15 @@ import api from '@/utils/api'
 export default class UserMe extends wepy.app {
   config = {
     pages: [
-      'pages/index',
+      'pages/items/index',
+      'pages/items/show',
+      'pages/orders/create',
+      'pages/orders/confirm',
+      'pages/orders/show',
+      'pages/orders/edit',
       'pages/users/me',
       'pages/users/edit',
+      'pages/users/orders',
       'pages/auth/authorization'
     ],
     window: {
@@ -61,7 +67,7 @@ export default class UserMe extends wepy.app {
     },
     tabBar: {
       list: [{
-        pagePath: 'pages/index',
+        pagePath: 'pages/items/index',
         text: '首页',
         iconPath: 'images/index.png',
         selectedIconPath: 'images/index_selected.png'

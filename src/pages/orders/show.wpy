@@ -1,0 +1,130 @@
+<style>
+.order-btn {
+    display:inline-block; 
+    width:45px;
+    height: 21px;
+    line-height: 21px;
+    padding:5px 10px;
+    margin-left: 5px; 
+    text-align: center;
+}
+.order-edit {
+    background: #0cc0ba;
+    color: #ffffff;
+}
+.order-cancel {
+    background: #E64340;
+    color: #ffffff;
+}
+</style>
+
+<template>
+<view class="navbar page">
+    <view class="page__bd">
+        <view class="weui-form-preview">
+            <view class="weui-form-preview__bd">
+                <view class="weui-form-preview__item">
+                    <view class="weui-form-preview__label">订单号</view>
+                    <view class="weui-form-preview__value">{{ order.order_number }}</view>
+                </view>
+                <view class="weui-form-preview__item">
+                    <view class="weui-form-preview__label">预约项目</view>
+                    <view class="weui-form-preview__value">{{ order.shop_item.item.name }}</view>
+                </view>
+                <view class="weui-form-preview__item">
+                    <view class="weui-form-preview__label">预约时间</view>
+                    <view class="weui-form-preview__value">{{ order.order_date_time }}</view>
+                </view>
+                <view class="weui-form-preview__item">
+                    <view class="weui-form-preview__label">创建时间</view>
+                    <view class="weui-form-preview__value">{{ order.created_at }}</view>
+                </view>
+            </view>
+            <view class="weui-form-preview__hd" wx:if="{{ order.step==1 }}">
+                <view class="weui-form-preview__item">
+                    <navigator class="order-btn order-edit" 
+                    url="edit?shop_id={{ order.shop_item.shop_id }}&item_id={{ order.shop_item.item_id }}&order_id={{ order.id }}&order_date={{ order.order_date }}&order_time={{ order.order_time }}">
+                        编辑
+                    </navigator>
+                    <navigator class="order-btn order-cancel" @tap="cancel" data-orderid="{{ order.id }}">
+                        取消
+                    </navigator>
+                </view>
+            </view>
+             <view class="weui-form-preview__hd" wx:if="{{ order.step==5 }}">
+                <view class="weui-form-preview__item">
+                    <view class="weui-form-preview__label">金额</view>
+                    <view class="weui-form-preview__value_in-hd" wx:if="{{ order.amount==0 }}">待生成</view>
+                    <view class="weui-form-preview__value_in-hd" wx:else>￥{{ order.amount }}</view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{ order.amount > 0 }}">
+                    <view class="weui-form-preview__label">待支付</view>
+                    <view class="weui-form-preview__value_in-hd" >￥{{ remain }}</view>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+
+export default class OrdersShow extends wepy.page {
+    data = {
+        order: null,
+        remain: null
+    }
+    async getOrder(id) {
+        try {
+            let orderResponse = await api.authRequest({
+                url: 'orders/' + id,
+                data: {
+                    include: 'shop_item,shop_item.item,shop_item.shop'
+                }
+            })
+            this.order = orderResponse.data
+            this.remain = (this.order.amount-this.order.paid).toFixed(2)
+            this.$apply()
+            console.log(this.order)
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+    methods = {
+         cancel(e) {
+            wx.showModal({
+                title: '提示',
+                content: '确定要取消本次预约吗？',
+                success(res) {
+                    if (res.confirm) {
+                     try {
+                        let orderResponse = api.authRequest({
+                            url: 'orders/' + e.currentTarget.dataset.orderid + '/cancel',
+                            method: 'PUT'
+                        })
+                        if (orderResponse.statusCode == 200) {
+                            wepy.navigateBack()
+                        }
+                     }catch(err) {
+                         console.log(err)
+                         wepy.showModal({
+                            title: '提示',
+                            content: '服务器错误，请联系管理员' 
+                         })
+                     }
+                    } 
+                }
+            })
+        }
+    }
+    async onLoad(options) {
+        this.getOrder(options.id)
+    }
+}
+</script>
