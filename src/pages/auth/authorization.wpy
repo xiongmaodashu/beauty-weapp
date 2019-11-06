@@ -38,7 +38,6 @@
       })
     }
     async bindgetuserinfo(e) {
-    //   console.log(e.detail.userInfo)
       let params = {
         iv: e.detail.iv,
         encryptedData: e.detail.encryptedData

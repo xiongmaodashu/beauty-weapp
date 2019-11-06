@@ -30,6 +30,13 @@ const timePassed = (orderTime, currentTime) => {
     return false
 }
 
+const isOrderExpired = (orderTime) => {
+    if (new Date(orderTime).getTime() < new Date(currentTime(new Date())).getTime()) {
+        return true
+    }
+    return false
+}
+
 const getIndex = (value, array, key) => {
     for (let i=0; i<array.length;i++) {
         if (array[i][key] == value) {
@@ -40,5 +47,5 @@ const getIndex = (value, array, key) => {
 }
 
 export default {
-    today, currentHour, timePassed, currentTime, getIndex
+    today, currentHour, timePassed, currentTime, getIndex, isOrderExpired
 }

@@ -1,25 +1,97 @@
 <style>
-  .bg-grey {
-    background:#bfbfbf;
-  }
-  .bg-white {
-    background: #ffffff;
+  .index-banner {
+    margin-bottom: 15rpx;
   }
   .index-nav {
-    margin:4px;
-    padding:5px;
+    margin:12rpx auto;
+    padding:5rpx;
     text-align: center;
   }
   .index-nav-title {
-    font-size:0.75em;
+    font-size:30rpx;
+    color: #aaaaaa;
+  }
+  .hot-item-box, .search-result {
+    width: 700rpx;
+    height: 350rpx;
+    margin:30rpx auto;
+    box-shadow: 1px 1px 8px rgba(234,136,159, 0.2);
   }
   .item-box {
-    width:49%;
-    height:250px;
-    float:left;
+    width: 50%;
+    height: 450rpx;
+    padding: 14rpx 20rpx;
+    float: left;
     overflow:hidden;
-    margin-bottom:5px;
-    box-shadow: 1px 1px 2px #BCBAC2;
+    box-sizing: border-box;
+    margin-bottom: 10rpx;
+  }
+  .item-content {
+    display: block;
+    width: 100%;
+    height: 100%;
+    box-shadow: 1px 1px 8px rgba(234,136,159, 0.2);
+    background: #ffffff;
+    overflow: hidden;
+  }
+  .item-thumbnail {
+    width: 700rpx;
+    height: 350rpx;
+  }
+  .item-name {
+    color: #ea889f;
+  }
+  .index-nav>view image {
+    width: 70rpx;
+    height: 70rpx;
+  }
+  .beauty-box-header {
+    width:70%;
+    margin: 70rpx auto;
+    padding: 10rpx 0;
+    text-align: center;
+    border: 3rpx solid #e5e5e5;
+  }
+  .beauty-box-title {
+    width: 200rpx;
+    position: relative;
+    top: -40rpx;
+    margin: 0 auto;
+    font-size: 40rpx;
+    color: #ea889f;
+    background: #f5f5f5;
+  }
+  .index-footer {
+    width: 100%;
+    height: 360rpx;
+    margin-top: 60rpx;
+    position: relative;
+  }
+  .index-footer image {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 180px;
+  }
+  .index-footer-content {
+    width: 50%;
+    position: absolute;
+    top: 60rpx;
+    left:48rpx;
+  }
+  .index-footer-content view {
+    margin-bottom: 18rpx;
+    color: #282828;
+  }
+  .index-footer-content navigator {
+    display: block;
+    width: 120rpx;
+    height: 56rpx;
+    line-height: 56rpx;
+    text-align: center;
+    background: #282828;
+    color: #f7f6f3;
+    padding: 6rpx 14rpx;
   }
 </style>
 <template>
@@ -40,53 +112,83 @@
       </view>
       <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
   </view>
-  <view style="height:15em;overflow:hidden">
-    <image src="/images/banner02.jpg" style="width:100%;max-height:100%;" />
-  </view>
+  <view wx:if="{{!isSearch}}">
+    <view class="index-banner">
+      <image src="/images/banner02.jpg" mode="widthFix" style="width:100%;max-height:100%;" />
+    </view>
 
-  <view class="weui-flex">
-      <view class="weui-flex__item">
-        <navigator class="index-nav" url="">
-          <image src="/images/shop.png" style="width:50px;height:50px;" />
-          <view class="index-nav-title">品牌介绍</view>
-        </navigator>
-      </view>
-       <view class="weui-flex__item">
-        <navigator class="index-nav" url="">
-          <image src="/images/tel.png" style="width:50px;height:50px;" />
-          <view class="index-nav-title">联系我们</view>
-        </navigator>
-      </view>
-       <view class="weui-flex__item">
-        <navigator class="index-nav" url="">
-          <image src="/images/order.png" style="width:50px;height:50px;" />
-          <view class="index-nav-title">在线预约</view>
-        </navigator>
-      </view>
-       <view class="weui-flex__item">
-        <navigator class="index-nav" url="">
-          <image src="/images/location.png" style="width:50px;height:50px;" />
-          <view class="index-nav-title">门店导航</view>
-        </navigator>
-      </view>
-  </view>
-  <view class="weui-flex">
-      <view class="weui-flex__item"><view class="placeholder">全部项目</view></view>
-  </view>
-
-  <view>
-    <repeat for="{{ items }}" key="id" index="index" item="item">
-      <view class="item-box">
-        <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
-          <view style="width:100%;">
-            <image src="{{ item.thumbnail }}" style="width:100%;height:200px" />
-            <view style="width:100%;text-align:center">{{ item.name }}</view>
+    <view class="weui-flex index-nav">
+        <view class="weui-flex__item">
+          <navigator class="index-nav" url="/pages/common/success">
+            <image src="/images/shop.png" />
+            <view class="index-nav-title">品牌介绍</view>
+          </navigator>
+        </view>
+        <view class="weui-flex__item">
+          <view class="index-nav" @tap="callUs">
+            <image src="/images/tel.png" />
+            <view class="index-nav-title">联系我们</view>
           </view>
+        </view>
+        <view class="weui-flex__item">
+          <navigator class="index-nav" url="/pages/orders/create?shop_id=1">
+            <image src="/images/order.png" />
+            <view class="index-nav-title">在线预约</view>
+          </navigator>
+        </view>
+        <view class="weui-flex__item">
+          <view class="index-nav" @tap="navigation">
+            <image src="/images/location.png" />
+            <view class="index-nav-title">门店导航</view>
+          </view>
+        </view>
+    </view>
+    
+    <view class="beauty-box-header">
+      <view class="beauty-box-title">热门项目</view>
+    </view>
+    <view style="overflow: hidden;">
+      <repeat for="{{ hotItems }}" key="id" index="index" item="item">
+        <view class="hot-item-box">
+          <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box_appmsg item-content" hover-class="weui-cell_active">
+            <image src="{{ item.thumbnail }}" class="item-thumbnail" mode="widthFix" />
+          </navigator>
+        </view>
+      </repeat>
+    </view>
+    
+    <view class="beauty-box-header">
+        <view class="beauty-box-title">全部项目</view>
+    </view>
+    <view style="overflow: hidden;">
+      <repeat for="{{ items }}" key="id" index="index" item="item">
+        <view class="item-box">
+          <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box_appmsg item-content" hover-class="weui-cell_active">
+            <image src="{{ item.thumbnail }}" class="item-thumbnail" />
+            <view style="width:100%;text-align:center" class="item-name">{{ item.name }}</view>
+          </navigator>
+        </view>
+      </repeat>
+    </view>
+
+    <view class="weui-flex index-footer">
+      <image src="/images/map1.png" />
+      <view class="index-footer-content">
+        <view>营业时间：9:00-21:00</view>
+        <view>地址：浙江省湖州市吴兴区人民路465号西北60米</view>
+        <navigator @tap="navigation">导航</navigator>
+      </view>
+    </view>
+  </view>
+  <view wx:else>
+    <repeat for="{{searchItems}}" item="item">
+      <view class="search-result">
+        <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box_appmsg item-content" hover-class="weui-cell_active">
+          <image src="{{ item.thumbnail }}" class="item-thumbnail" mode="widthFix" />
         </navigator>
       </view>
     </repeat>
   </view>
-
 </view>
 </template>
 
@@ -99,7 +201,10 @@ export default class Index extends wepy.page {
         inputShowed: false,
         inputVal: '',
         items: [],
-        page: 1
+        page: 1,
+        isSearch: false,
+        searchItems: [],
+        hotItems: []
       };
 
       async getItems(page = 1) {
@@ -122,23 +227,92 @@ export default class Index extends wepy.page {
         }
       }
 
+      async getHotItems() {
+        try {
+          let hotItemsResponse = await api.request({
+            url: 'items/category',
+            data: {
+              badge: '2'
+            }
+          })
+          let hotItems = hotItemsResponse.data.data
+          this.hotItems = hotItems
+          this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
+        }
+      }
+
+      async search(keyword) {
+        try {
+            let searchResponse = await api.request({
+                url: 'items/search',
+                data: {
+                    keyword: keyword
+                }
+            })
+            let searchItems = searchResponse.data.data
+            this.searchItems = searchItems
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+
       async onLoad() {
+        this.getHotItems()
         this.getItems()
       }
 
       methods = {
         showInput () {
           this.inputShowed = true
+          this.isSearch = true
         },
         hideInput () {
           this.inputVal = ''
           this.inputShowed = false
+          this.isSearch = false
+          this.searchItems = []
         },
         clearInput () {
           this.inputVal = ''
+          this.searchItems = []
         },
         inputTyping (e) {
-          this.inputVal = e.detail.value
+          if (e.detail.cursor == e.detail.value.length) {
+              this.inputVal = e.detail.value
+              this.search(this.inputVal)
+          }
+        },
+        callUs() {
+          wx.makePhoneCall ({
+            phoneNumber: '05722222255'
+          })
+        },
+        navigation() {
+          wx.getLocation({
+            type: 'gcj02',
+            success: function (res) {
+              var latitude = res.latitude
+              var longitude = res.longitude
+              wx.openLocation({
+                latitude: latitude,
+                longitude: longitude,
+                name: "倍美医疗美容",
+                address:"浙江省湖州市吴兴区人民路465号西北60米",
+                scale: 18
+              })
+            }
+          })
         }
       }
     }

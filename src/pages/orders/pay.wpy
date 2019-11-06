@@ -1,0 +1,96 @@
+<style lang="less">
+.submit-btn {
+    width: 600rpx;
+    height: 100rpx;
+    line-height: 100rpx;
+    border-radius: 10rpx;
+    background: #ea889f;
+    color: #f7f6f3;
+    margin: 60rpx auto;
+}
+</style>
+
+<template>
+    <view class="page__bd">
+        <view class="weui-toptips weui-toptips_warn" wx:if="{{error}}">{{ error }}</view>
+        <view class="weui-cells__title">请选择付款方式</view>
+        <view class="weui-cells weui-cells_after-title">
+            <radio-group @change="choosePaymentWay">
+                <label class="weui-cell weui-check__label" wx:for="{{payment_ways}}" wx:key="value">
+                    <radio class="weui-check" value="{{item.value}}" checked="{{item.checked}}"/>
+
+                    <view class="weui-cell__bd">{{item.name}}</view>
+                    <view class="weui-cell__ft weui-cell__ft_in-radio" wx:if="{{item.checked}}">
+                        <icon class="weui-icon-radio" type="success_no_circle" size="16"></icon>
+                    </view>
+                </label>
+            </radio-group>
+        </view>
+        <view class="weui-btn-area">
+            <button class="weui-btn submit-btn" @tap="pay">确定</button>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+
+export default class OrdersPay extends wepy.page {
+    data = {
+        order_id: null,
+        payment_way: null,
+        payment_ways: [
+            {name: '会员卡', value: 'user_card', checked: false},
+        ],
+        error: null
+    }
+
+    methods = {
+        choosePaymentWay(e) {
+            this.error = null
+            this.payment_ways.forEach(v => {
+                v.checked = v.value === e.detail.value;
+                 this.payment_way = e.detail.value
+            });
+        },
+        async pay() {
+            if (!this.payment_way) {
+                this.error = '请选择付款方式'
+                return false
+            }
+            try {
+                let payResponse = await api.authRequest({
+                    url: 'pay/' + this.order_id + '/' + this.payment_way,
+                    method: 'POST'
+                })
+                wepy.showLoading({title: '支付中'})
+                if (payResponse.statusCode === 422) {
+                    wepy.hideLoading()
+                    this.error = payResponse.data.msg
+                    this.$apply()
+                    return false
+                }
+                if (payResponse.statusCode === 200) {
+                    wepy.hideLoading()
+                    wx.redirectTo({
+                        url: '/pages/common/success?type=pay'
+                    })
+                }
+
+            } catch (err) {
+                console.log(err)
+                wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+                })
+            }
+            
+        }
+    }
+
+    onLoad(options) {
+        this.order_id = options.id
+    }
+}
+</script>

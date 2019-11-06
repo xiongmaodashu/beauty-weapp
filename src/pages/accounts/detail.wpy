@@ -1,0 +1,95 @@
+<style lang="less">
+.weui-form-preview__label, .weui-form-preview__value {
+    font-size: 32rpx;
+}
+.weui-form-preview__value_in-hd {
+    font-size: 48rpx;
+}
+</style>
+
+<template>
+    <view class="navbar page">
+        <view class="page__bd">
+            <view class="weui-form-preview">
+                <view class="weui-form-preview__bd">
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">流水号</view>
+                        <view class="weui-form-preview__value">{{ account_detail.serial_number }}</view>
+                    </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">交易类型</view>
+                        <view class="weui-form-preview__value">{{ account_detail.type_text }}</view>
+                    </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">支付方式</view>
+                        <view class="weui-form-preview__value">{{ account_detail.payment_way }}</view>
+                    </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">交易时间</view>
+                        <view class="weui-form-preview__value">{{ account_detail.created_at }}</view>
+                    </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label" wx:if="{{ account_detail.shop }}">门店</view>
+                        <view class="weui-form-preview__value">{{ account_detail.shop.name }}</view>
+                    </view>
+                    <view class="weui-form-preview__item" wx:if="{{ account_detail.order }}">
+                        <view class="weui-form-preview__label">项目</view>
+                        <view class="weui-form-preview__value">{{ account_detail.order.shop_item.item.name }}</view>
+                    </view>
+                </view>
+                <view class="weui-form-preview__hd">
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">订单金额</view>
+                        <view class="weui-form-preview__value_in-hd">￥{{ account_detail.amount }}</view>
+                    </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">支付金额</view>
+                        <view class="weui-form-preview__value_in-hd" >￥{{ account_detail.actually_paid }}</view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+
+export default class AccountDetail extends wepy.page {
+    data = {
+        account_detail: null,
+        include_item: null
+    }
+    async getAccountDetail(id, order_id, shop_id) {
+        let include_items = []
+        if (order_id != 'null') {
+            include_items.push('order.shop_item.item')
+        } 
+        if (shop_id != 'null') {
+            include_items.push('shop')
+        } 
+        this.include_item = include_items.join(',')
+        try {
+            let accountDetailResponse = await api.authRequest({
+                url: 'accounts/' + id,
+                data: {
+                    include: this.include_item
+                }
+            })
+            this.account_detail = accountDetailResponse.data
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+    onLoad(options) {
+        this.getAccountDetail(options.id, options.order_id, options.shop_id)
+    }
+}
+</script>
+

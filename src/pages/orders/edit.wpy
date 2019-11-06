@@ -1,59 +1,81 @@
 <style lang="less">
-    .orderable_date {
-        width:100px;
-        height:70px;
-        line-height: 35px;
-        border: 1px solid #0cc0ba;
-        border-radius: 5px;
-        margin: 0 3px;
-        padding:0 8px;
-        display: inline-block;
-    }
-    .orderable_date.active {
-        background: #0cc0ba;
-        color: #ffffff;
-    }
-    .orderable_date view {
-        text-align: center;
-    }
-    .orderable_time {
-        width:25%;
-        height: 50px;
-        line-height: 50px;
-        padding:0 4px;
-        margin-bottom:8px;
-        display: inline-block;
-        box-sizing: border-box;
-    }
-    .orderable_time .active {
-        background: #0cc0ba;
-        color: #ffffff;
-    }
-    .orderable_time .disabled {
-        background: #bababa;
-    }
-    .orderable_time view {
-        border: 1px solid #0cc0ba;
-        border-radius: 5px;
-        text-align: center;
-    }
-    .error-message {
-        color: #E64340;
-    }
-    .next-btn {
-        display: block;
-        width:100%;
-        height: 50px;
-        line-height: 50px;
-        background: #0cc0ba;
-        color: #ffffff;
-        text-align: center;
-        margin-top: 20px; 
-    }
+.weui-cells::before, .weui-cells::after {
+    border: none;
+}
+.weui-cells_after-title {
+    background: #f5f5f5;
+}
+.orderable_date {
+    width:100px;
+    height:70px;
+    line-height: 35px;
+    border: 1px solid #ea889f;
+    border-radius: 5px;
+    margin: 0 3px;
+    padding:0 8px;
+    display: inline-block;
+}
+.orderable_date.active {
+    background: #ea889f;
+    color: #f7f6f3;
+}
+.orderable_date view {
+    text-align: center;
+}
+.orderable_time {
+    width:25%;
+    height: 100rpx;
+    padding:0 5rpx;
+    margin-bottom:20rpx;
+    display: inline-block;
+    box-sizing: border-box;
+}
+.orderable_time .active {
+    background: #ea889f;
+    color: #f7f6f3;
+}
+.orderable_time .disabled {
+    background: #bababa;
+}
+.orderable_time>view {
+    padding: 10rpx;
+    border: 1px solid #ea889f;
+    border-radius: 5px;
+    text-align: center;
+}
+.error-message {
+    color: #E64340;
+}
+.next-btn {
+    display: block;
+    width:100%;
+    height: 50px;
+    line-height: 50px;
+    background: #ea889f;
+    color: #f7f6f3;
+    text-align: center;
+    margin-top: 20px; 
+}
+.weui-textarea {
+    background: #ffffff;
+    padding: 20rpx;
+    box-sizing: border-box;
+    height: 200rpx;
+}
 </style>
 
 <template>
 <view class="page">
+    <view class="weui-cells__title">预约项目
+        <text wx:if="{{ errors.item_id }}" class="weui-cells__tips error-message">{{ errors.item_id }}</text>
+    </view>
+    <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell__hd">
+            <picker @change="chooseItem" value="{{itemIndex}}" range="{{orderableItems}}" range-key="name">
+                <view class="weui-select">{{orderableItems[itemIndex].name}}</view>
+            </picker>
+        </view>
+    </view>
     <view class="weui-cells__title">预约日期
         <text wx:if="{{ errors.order_date }}" class="weui-cells__tips error-message">{{ errors.order_date }}</text>
     </view>
@@ -76,7 +98,8 @@
         <repeat for="{{ orderableTime.order_time }}" key="id" index="index" item="time">
             <view class="orderable_time" data-index={{index}} data-text="{{ time.time }}" bindtap="chooseTime">
                 <view class="{{ timeIndex == index?'active':'' }}{{ time.passed ?'disabled':''}}">
-                    {{ time.time }}({{ time.count }}/{{ orderableTime.max_number }})
+                    <view class="order_times">{{ time.time }}</view>
+                    <view class="order_counts">{{ time.count }}/{{ orderableTime.max_number }}</view>
                 </view>
             </view>
         </repeat>
@@ -86,7 +109,7 @@
     <view class="weui-cells weui-cells_after-title">
         <view class="weui-cell">
             <view class="weui-cell__bd">
-                <textarea class="weui-textarea" placeholder="请输入备注信息" style="height: 5.3em" />
+                <textarea class="weui-textarea" placeholder="请输入备注信息" @input="inputRemark" value="{{order.remark}}" />
             </view>
         </view>
     </view>
@@ -106,8 +129,11 @@ export default class OrdersEdit extends wepy.page {
     }
 
     data = {
+        order: null,
         shop_id: null,
         item_id: null,
+        orderableItems: null,
+        itemIndex: 0,
         orderableDate: null,
         orderableTime: null,
         orderDate: null,
@@ -115,7 +141,63 @@ export default class OrdersEdit extends wepy.page {
         dateIndex: null,
         timeIndex: null,
         orderId: null,
+        remark: null,
         errors: {}
+    }
+
+    async getOrder(id) {
+        try {
+            let orderResponse = await api.authRequest({
+                url: 'orders/' + id,
+                data: {
+                    include: 'shop_item,shop_item.item,shop_item.shop'
+                }
+            })
+            this.order = orderResponse.data
+            this.shop_id = this.order.shop_item.shop.id
+            this.item_id = this.order.shop_item.item.id
+            this.orderDate = this.order.order_date
+            this.orderTime = this.order.order_time.substring(0, 5)
+            this.remark = this.order.remark
+            this.getOrderableItems(this.shop_id, this.item_id)
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+
+    async getOrderableItems(shop_id, item_id) {
+        try {
+            let orderableItemsResponse = await api.request({
+                url: 'orders/order_items?shop_id=' + shop_id
+            })
+            let orderableItems = orderableItemsResponse.data.items
+            this.orderableItems = orderableItems
+            if (item_id) {
+                this.item_id = item_id
+                let _this = this
+                this.orderableItems.forEach(function(item, index) {
+                    if (item.id == item_id) {
+                        _this.itemIndex = index
+                    }
+                })
+            } else {
+                this.item_id = this.orderableItems[0].id
+            }
+            this.getOrderableDate(this.item_id, this.shop_id)
+            this.getOrderableTime(this.item_id, this.shop_id, this.orderDate)
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
     }
 
     async getOrderableDate(item_id, shop_id) {
@@ -156,46 +238,56 @@ export default class OrdersEdit extends wepy.page {
             })
         }
     }
-    chooseDate(e) {
-        this.getOrderableTime(this.item_id, this.shop_id, e.currentTarget.dataset.text)
-        this.dateIndex = e.currentTarget.dataset.index
-        this.orderDate = e.currentTarget.dataset.text
-        this.orderTime = null
-        this.timeIndex = null
-        this.errors = {}
-    }
-    chooseTime(e) {
-        if (util.timePassed(this.orderDate + ' ' + e.currentTarget.dataset.text + ':00', util.currentTime(new Date()))) {
-            return false
-        }
-        this.timeIndex = e.currentTarget.dataset.index
-        this.orderTime = e.currentTarget.dataset.text
-        this.errors = {}
-        
-    }
-    async nextStep() {
-        if (this.orderTime === null) {
-            this.errors.order_time = '请选择预约时间'
-            return false
-        }
-        if (this.orderDate === null) {
-            this.errors.order_date = '请选择预约日期'
-            return false
-        }
+    
+    methods = {
+        chooseItem(e) {
+            this.itemIndex = e.detail.value
+            this.item_id = this.orderableItems[this.itemIndex].id
+            this.getOrderableDate(this.item_id, this.shop_id)
+            this.getOrderableTime(this.item_id, this.shop_id, this.orderDate)
+            this.timeIndex = null
+        },
+        chooseDate(e) {
+            this.getOrderableTime(this.item_id, this.shop_id, e.currentTarget.dataset.text)
+            this.dateIndex = e.currentTarget.dataset.index
+            this.orderDate = e.currentTarget.dataset.text
+            this.orderTime = null
+            this.timeIndex = null
+            this.errors = {}
+        },
+        chooseTime(e) {
+            if (util.timePassed(this.orderDate + ' ' + e.currentTarget.dataset.text + ':00', util.currentTime(new Date()))) {
+                return false
+            }
+            this.timeIndex = e.currentTarget.dataset.index
+            this.orderTime = e.currentTarget.dataset.text
+            this.errors = {}
+            
+        },
+        inputRemark(e) {
+            this.remark = e.detail.value
+        },
+        async nextStep() {
+            if (this.orderTime === null) {
+                this.errors.order_time = '请选择预约时间'
+                return false
+            }
+            if (this.orderDate === null) {
+                this.errors.order_date = '请选择预约日期'
+                return false
+            }
 
-        wx.navigateTo({
-            url: "/pages/orders/confirm?shop_id="+this.shop_id+"&item_id="+this.item_id+"&order_date="+this.orderDate+"&order_time="+this.orderTime+"&order_id="+this.orderId
-        })
+            wx.navigateTo({
+                url: "/pages/orders/confirm?shop_id="+this.shop_id+
+                "&item_id="+this.item_id+"&order_date="+this.orderDate+
+                "&order_time="+this.orderTime+"&order_id="+this.orderId+"&remark="+this.remark
+            })
+        }
     }
 
     onLoad(options) {
-        this.getOrderableDate(options.item_id, options.shop_id)
-        this.getOrderableTime(options.item_id, options.shop_id, options.order_date)
-        this.shop_id = options.shop_id
-        this.item_id = options.item_id
-        this.orderDate = options.order_date
-        this.orderTime = options.order_time.substring(0, 5)
         this.orderId = options.order_id
+        this.getOrder(options.order_id)
     }
 }
 </script>

@@ -1,7 +1,31 @@
+<style lang="less">
+.weui-article__p {
+    font-size: 36rpx;
+}
+.item-thumbnail {
+    width: 700rpx;
+    height: 350rpx;
+    overflow: hidden;
+}
+.item-thumbnail image {
+    width: 700rpx;
+    height: 350rpx;
+}
+.confirm-btn {
+    width: 600rpx;
+    height: 100rpx;
+    line-height: 100rpx;
+    border-radius: 10rpx;
+    background: #ea889f;
+    color: #f7f6f3;
+}
+</style>
 <template>
+
 <view class="page__bd">
+    <view class="weui-toptips weui-toptips_warn" wx:if="{{ error }}">{{ error }}</view>
     <view class="weui-article">
-        <view class="weui-article__p">
+        <view class="weui-article__p item-thumbnail" mode="widthFix">
             <image src="{{ item.thumbnail }}" />
         </view>
         <view class="weui-article__p">
@@ -14,8 +38,14 @@
             预约时间：{{ order_time }}
         </view>
         <view class="weui-article__p">
-            <button wx:if="{{ order_id }}" @tap="update">确认修改</button>
-            <button wx:else @tap="update">确认预约</button>
+            预约时间：{{ order_time }}
+        </view>
+        <view class="weui-article__p">
+            备注信息：{{ remark }}
+        </view>
+        <view class="weui-article__p">
+            <button wx:if="{{ order_id }}" @tap="update" class="confirm-btn">确认修改</button>
+            <button wx:else @tap="submit" class="confirm-btn">确认预约</button>
         </view>
     </view>
 </view>
@@ -31,7 +61,9 @@ export default class OrderConfirm extends wepy.page {
         shop_id: null,
         order_date: null,
         order_time: null,
-        order_id: null
+        remark: null,
+        order_id: null,
+        error: null,
     }
     async getItem(id) {
         try {
@@ -56,14 +88,21 @@ export default class OrderConfirm extends wepy.page {
         params.shop_id = this.shop_id
         params.order_date = this.order_date
         params.order_time = this.order_time
+        params.remark = this.remark
         try {
             let orderResponse = await api.authRequest({
                 url: "orders",
                 method: "post",
                 data: params
             })
-            if (orderResponse.statusCode == 200) {
-                console.log(orderResponse.data)
+            if (orderResponse.statusCode === 422) {
+                this.error = orderResponse.data.message
+                this.$apply()
+            }
+            if (orderResponse.statusCode === 201) {
+                wx.redirectTo({
+                    url: '/pages/common/success?type=create_order'
+                })
             }
         } catch (err) {
             console.log(err)
@@ -76,16 +115,25 @@ export default class OrderConfirm extends wepy.page {
 
     async update() {
         let params={}
+        params.item_id = this.item.id
+        params.shop_id = this.shop_id
         params.order_date = this.order_date
         params.order_time = this.order_time
+        params.remark = this.remark
         try {
             let orderResponse = await api.authRequest({
                 url: 'orders/' + this.order_id,
                 method: 'PUT',
                 data: params
             })
-            if (orderResponse.statusCode == 200) {
-                console.log(orderResponse.data)
+            if (orderResponse.statusCode === 422) {
+                this.error = orderResponse.data.message
+                this.$apply()
+            }
+            if (orderResponse.statusCode === 201) {
+                wx.redirectTo({
+                    url: '/pages/common/success?type=update_order'
+                })
             }
         } catch (err) {
             console.log(err)
@@ -101,6 +149,7 @@ export default class OrderConfirm extends wepy.page {
         this.getItem(options.item_id)
         this.order_date = options.order_date
         this.order_time = options.order_time
+        this.remark = options.remark
         this.shop_id = options.shop_id
         this.order_id = options.order_id
     }

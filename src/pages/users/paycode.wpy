@@ -1,0 +1,104 @@
+<style lang="less">
+.weui-panel__hd {
+    font-size: 36rpx;
+    text-align: center;
+}
+.pay-prompt {
+    text-align: center;
+    font-size: 32rpx;
+}
+.payment-code-barcode {
+    width: 680rpx;
+    height: 200rpx;
+    margin: 0 auto;
+}
+.payment-code-barcode canvas {
+    width: 680rpx;
+    height: 200rpx;
+}
+.payment-code-qrcode {
+    width: 600rpx;
+    height: 600rpx;
+    margin: -20px auto;
+}
+.payment-code-qrcode canvas {
+    width: 600rpx;
+    height: 600rpx;
+    margin: 0 auto;
+}
+.payment-code-text {
+    text-align: center;
+    font-size: 36rpx;
+}
+</style>
+
+<template>
+    <view class="page">
+        <view class="page__bd">
+            <view class="weui-panel weui-panel_access">
+                <view class="weui-panel__hd">湖州倍美医疗</view>
+            </view>
+            <view url="#" @tap="refreshCode">
+                <view class="weui-media-box weui-media-box_text">
+                    <view class="weui-media-box__title weui-media-box__title_in-text pay-prompt">请出示给店员扫码支付</view>
+                    <view class="weui-media-box__desc payment-code-barcode">
+                        <canvas canvas-id="barcode" />
+                    </view>
+                </view>
+                <view class="weui-media-box weui-media-box_text">
+                    <view class="weui-media-box__title weui-media-box__title_in-text payment-code-text">{{ payment_code_format }}</view>
+                    <view class="weui-media-box__desc payment-code-qrcode">
+                        <canvas canvas-id="qrcode" />
+                    </view>
+                    <view class="pay-prompt" style="font-size:1rem;padding-bottom:5px;">点击刷新</view>
+                    <view class="pay-prompt">每个付款码只能使用一次，5分钟内有效</view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+import wxbarcode from 'wxbarcode'
+
+export default class UsersPaycode extends wepy.page {
+    data = {
+        payment_code: '加载中...',
+        payment_code_format: '加载中...'
+    }
+
+    async paymentCode() {
+        try {
+            let paymentCodeResponse = await api.authRequest({
+                url: 'pay/code',
+                method: 'POST'
+            })
+            this.payment_code = String(paymentCodeResponse.data)
+            this.payment_code_format = this.payment_code.substring(0,4)+ ' ' + this.payment_code.substring(4,8) +
+            ' ' + this.payment_code.substring(8,12) + ' ' + this.payment_code.substring(12,16)
+            wxbarcode.barcode('barcode', this.payment_code, 680, 200)
+            wxbarcode.qrcode('qrcode', this.payment_code, 600, 600)
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+
+    methods = {
+        refreshCode() {
+            this.paymentCode()
+        }
+    }
+
+    onLoad() {
+        this.paymentCode()
+    }
+}
+</script>
+

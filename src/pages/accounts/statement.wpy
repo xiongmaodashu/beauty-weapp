@@ -1,0 +1,166 @@
+<style lang="less">
+.weui-navbar__item.weui-bar__item_on {
+    color: #ea889f;
+}
+.weui-cell {
+    padding: 36rpx 30rpx;
+}
+.detail-date {
+    text-align: left;
+}
+.detail-amount {
+    text-align: right;
+    padding-right: 3px;
+}
+.tab-content .weui-form-preview {
+    margin-bottom: 8px;
+}
+.weui-loadmore__tips_in-line {
+    background-color: #f8f8f8;
+}
+</style>
+
+<template>
+    <view class="navbar page">
+        <view class="page__bd">
+            <view class="weui-tab">
+                <view class="weui-navbar">
+                    <view wx:for="{{tabs}}" wx:key="*this" id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
+                        <view class="weui-navbar__title">{{item}}</view>
+                    </view>
+                </view>
+                <view class="weui-tab__panel">
+                    <view class="weui-tab__content tab-content" hidden="{{activeIndex != 0}}">
+                        <view class="weui-cells weui-cells_after-title">
+                            <repeat for="{{ account_statements }}" key="id" index="index" item="statement">
+                                <navigator url="/pages/accounts/detail?id={{statement.id}}&order_id={{statement.order_id}}&shop_id={{statement.shop_id}}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                    <view class="weui-cell__bd detail-date">{{ statement.created_date }}</view>
+                                    <view wx:if="{{ statement.type === 'recharge'}}" class="weui-cell__bd detail-amount">
+                                        +{{ statement.amount }}
+                                    </view>
+                                    <view wx:else class="weui-cell__bd detail-amount">
+                                        -{{ statement.actually_paid }}
+                                    </view>
+                                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                                </navigator>
+                            </repeat>
+                        </view>
+                        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                        </view>
+                     </view>
+                     <view class="weui-tab__content tab-content" hidden="{{activeIndex != 1}}">
+                        <view class="weui-cells weui-cells_after-title">
+                            <repeat for="{{ account_statements }}" key="id" index="index" item="statement">
+                                <navigator url="/pages/accounts/detail?id={{statement.id}}&order_id={{statement.order_id}}&shop_id={{statement.shop_id}}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                    <view class="weui-cell__bd detail-date">{{ statement.created_date }}</view>
+                                    <view class="weui-cell__bd detail-amount">
+                                        -{{ statement.actually_paid }}
+                                    </view>
+                                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                                </navigator>
+                            </repeat>
+                        </view>
+                        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                        </view>
+                    </view>
+                     <view class="weui-tab__content tab-content" hidden="{{activeIndex != 2}}">
+                        <view class="weui-cells weui-cells_after-title">
+                            <repeat for="{{ account_statements }}" key="id" index="index" item="statement">
+                                <navigator url="/pages/accounts/detail?id={{statement.id}}&order_id={{statement.order_id}}&shop_id={{statement.shop_id}}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                    <view class="weui-cell__bd detail-date">{{ statement.created_date }}</view>
+                                    <view class="weui-cell__bd detail-amount">
+                                        +{{ statement.amount }}
+                                    </view>
+                                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                                </navigator>
+                            </repeat>
+                        </view>
+                        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+
+export default class AccountsStatement extends wepy.page {
+    data = {
+        account_statements: [],
+        tabs: ['全部', '消费', '充值'],
+        activeIndex: 0,
+        type: null,
+        page: 1,
+        noMoreData: false
+    }
+    async getAccountStatement() {
+        let params = {}
+        params.page = this.page
+        if (this.type) {
+            params.type = this.type
+        }
+        try {
+            let accountStatementResponse = await api.authRequest({
+                url: 'accounts/statement',
+                data: params
+            })
+            let account_statements = accountStatementResponse.data.data
+            this.account_statements = this.account_statements.concat(account_statements)
+            let pagination = accountStatementResponse.data.meta.pagination
+            if (pagination.current_page === pagination.total_pages) {
+                this.noMoreData = true
+            }
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+    methods = {
+        tabClick (e) {
+            this.activeIndex = e.currentTarget.id
+            this.page = 1
+            this.account_statements = []
+            this.noMoreData = false
+            switch (this.activeIndex) {
+                case '0':
+                    this.type = null
+                    this.getAccountStatement()
+                    break
+                case '1':
+                    this.type = 'consume'
+                    this.getAccountStatement()
+                    break
+                case '2':
+                    this.type = 'recharge'
+                    this.getAccountStatement()
+                    break
+            }
+        }
+    }
+
+    async onReachBottom () {
+      if (this.noMoreData) {
+        return
+      }
+      this.page = this.page + 1
+      await this.getAccountStatement()
+      this.$apply()
+    }
+
+    onLoad() {
+        this.getAccountStatement()
+    }
+}
+</script>
+

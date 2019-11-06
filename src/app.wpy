@@ -1,7 +1,7 @@
 <style lang="less">
 @import 'style/weui.less';
 page{
-  background-color: #F8F8F8;
+  background-color: #f5f5f5;
   font-size: 16px;
 }
 .page__hd {
@@ -50,14 +50,21 @@ export default class UserMe extends wepy.app {
     pages: [
       'pages/items/index',
       'pages/items/show',
+      'pages/items/category',
       'pages/orders/create',
       'pages/orders/confirm',
       'pages/orders/show',
       'pages/orders/edit',
+      'pages/orders/pay',
       'pages/users/me',
       'pages/users/edit',
       'pages/users/orders',
-      'pages/auth/authorization'
+      'pages/users/paycode',
+      'pages/accounts/statement',
+      'pages/accounts/detail',
+      'pages/auth/authorization',
+      'pages/common/success',
+      'pages/users/phone'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -71,14 +78,20 @@ export default class UserMe extends wepy.app {
         text: '首页',
         iconPath: 'images/index.png',
         selectedIconPath: 'images/index_selected.png'
-      }, {
+      },{
+        pagePath: 'pages/items/category',
+        text: '分类',
+        iconPath: 'images/category.png',
+        selectedIconPath: 'images/category_selected.png'
+      },
+       {
         pagePath: 'pages/users/me',
         text: '我的',
         iconPath: 'images/user.png',
         selectedIconPath: 'images/user_selected.png'
       }],
-      color: '#bfbfbf',
-      selectedColor: '#0cc0ba'
+      color: '#aaaaaa',
+      selectedColor: '#ea889f '
     }
   }
 

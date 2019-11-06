@@ -5,6 +5,14 @@
   .error-message {
     color: #E64340;
   }
+  .submit-btn {
+    width: 600rpx;
+    height: 100rpx;
+    line-height: 100rpx;
+    border-radius: 10rpx;
+    background: #ea889f;
+    color: #f7f6f3;
+  }
 </style>
 <template>
   <view class="page">
@@ -40,7 +48,15 @@
         <!-- 邮箱错误信息 -->
         <view wx:if="{{ errors.email }}" class="weui-cells__tips error-message">{{ errors.email[0] }}</view>
 
-        <!-- 填写邮箱 -->
+        <view class="weui-cells__title">手机</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__bd">
+              <input class="weui-input" placeholder="绑定手机" name="phone" value="{{ phone?phone:user.phone }}" @tap="bindPhone" />
+            </view>
+          </view>
+        </view>
+
         <view class="weui-cells__title">地址</view>
         <view class="weui-cells weui-cells_after-title">
           <view class="weui-cell">
@@ -53,10 +69,8 @@
             </view>
           </view>
         </view>
-        <!-- 邮箱错误信息 -->
         <view wx:if="{{ errors.address }}" class="weui-cells__tips error-message">{{ errors.address[0] }}</view>
 
-        <!-- 填写邮箱 -->
         <view class="weui-cells__title">生日</view>
         <view class="weui-cells weui-cells_after-title">
           <view class="weui-cell">
@@ -72,12 +86,11 @@
             </view>
           </view>
         </view>
-        <!-- 邮箱错误信息 -->
         <view wx:if="{{ errors.birthday }}" class="weui-cells__tips error-message">{{ errors.birthday[0] }}</view>
 
         <!-- 提交表单 -->
         <view class="weui-btn-area">
-          <button class="weui-btn" type="primary" formType="submit">修改</button>
+          <button class="submit-btn" formType="submit">修改</button>
         </view>
       </form>
     </view>
@@ -95,6 +108,7 @@
     data = {
         user: null,
         date: null,
+        phone: null,
         errors: null
     }
     async onShow() {
@@ -143,7 +157,11 @@
             console.log('picker发送选择改变，携带值为', e.detail.value)
             this.date = e.detail.value
         },
+        bindPhone() {
+          wepy.navigateTo({
+            url: '/pages/users/phone'
+          })
+        }
     }
-    
   }
 </script>

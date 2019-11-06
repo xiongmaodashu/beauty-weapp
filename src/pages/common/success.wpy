@@ -1,0 +1,133 @@
+<style lang="less">
+.success-icon {
+    text-align: center;
+}
+.success-icon image {
+    width: 186rpx;
+    height: 186rpx;
+}
+.success-info {
+    margin-top: 40rpx;
+}
+.success-info-title {
+    font-size: 42rpx;
+}
+.success-info-desc {
+    font-size: 28rpx;
+    margin-top: 24rpx;
+}
+.success-msg-btn {
+    margin-top: 100rpx;
+}
+.message-btn {
+    display: block;
+    text-align: center;
+    width: 75%;
+    margin: 0 auto;
+    height: 72rpx;
+    line-height: 72rpx;
+    padding: 10rpx;
+    border-radius: 10rpx;
+    margin-bottom: 30rpx; 
+}
+.msg-btn-success {
+    background: #ea889f;
+    border: 1px solid #ea889f;
+    color: #f7f6f3;
+}
+.msg-btn-default {
+    background: #282828;
+    border: 1px solid #282828;
+    color: #f7f6f3;
+}
+
+</style>
+
+<template>
+    <view class="page">
+        <view class="weui-msg">
+            <view class="weui-msg__icon-area success-icon">
+                <image src="/images/success-icon.png" />
+            </view>
+            <view class="weui-msg__text-area success-info">
+                <view class="weui-msg__title success-info-title">{{ message_title }}</view>
+                <view class="weui-msg__desc success-info-desc">{{ message_desc }}</view>
+            </view>
+            <view class="weui-msg__opr-area success-msg-btn">
+                <view class="weui-btn-area">
+                    <navigator url="" class="message-btn msg-btn-success">{{ action1_name }}</navigator>
+                    <navigator url="{{ action2_url }}" class="message-btn msg-btn-default">{{ action2_name }}</navigator>
+                </view>
+            </view>
+            <view class="weui-msg__extra-area">
+                <view class="weui-footer">
+                    <view class="weui-footer__links">
+                        <navigator url="{{ footer_url }}" class="weui-footer__link">{{ footer_text }}</navigator>
+                    </view>
+                    <view class="weui-footer__text">Copyright © 2019 湖州倍美医疗</view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+
+export default class CommonSuccess extends wepy.page {
+    data = {
+        message_title: null,
+        message_desc: null,
+        action1_name: null,
+        action1_url: null,
+        action2_name: null,
+        action2_url: null,
+        footer_text: '返回首页',
+        footer_url: '/pages/items/index'
+    }
+    message(type) {
+        switch (type) {
+            case 'create_order':
+                this.message_title = '预约成功'
+                this.message_desc = '请您安排好时间，提前到店确认，享受我们的服务。'
+                this.action1_name = '继续预约'
+                this.action2_url = '/pages/orders/create'
+                this.action2_name = '查看订单'
+                this.action2_url = '/pages/users/orders'
+                this.$apply()
+                break;
+            case 'update_order':
+                this.message_title = '修改成功'
+                this.message_desc = '请您安排好时间，提前到店确认，享受我们的服务。'
+                this.action1_name = '继续预约'
+                this.action2_url = '/pages/orders/create'
+                this.action2_name = '查看订单'
+                this.action2_url = '/pages/users/orders'
+                this.$apply()
+                break
+            case 'pay':
+                this.message_title = '支付成功'
+                this.message_desc = '感谢您的支持，欢迎再次光临。'
+                this.action1_name = '继续预约'
+                this.action2_url = '/pages/orders/create'
+                this.action2_name = '查看订单'
+                this.action2_url = '/pages/users/orders'
+                this.$apply()
+                break
+            default:
+                this.message_title = '成功'
+                this.message_desc = '您的请求已成功处理。'
+                this.action1_name = '返回首页'
+                this.action2_url = '/pages/items/index'
+                this.action2_name = '查看订单'
+                this.action2_url = '/pages/users/orders'
+                this.$apply()
+                break
+
+        }
+    }
+    onLoad(options) {
+        this.message(options.type)
+    }
+}
+</script>

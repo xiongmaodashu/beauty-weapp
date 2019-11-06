@@ -1,4 +1,10 @@
 <style>
+.weui-form-preview__label, .weui-form-preview__value {
+    font-size: 32rpx;
+}
+.weui-form-preview__value_in-hd {
+    font-size: 48rpx;
+}
 .order-btn {
     display:inline-block; 
     width:45px;
@@ -9,12 +15,44 @@
     text-align: center;
 }
 .order-edit {
-    background: #0cc0ba;
-    color: #ffffff;
+    background: #ea889f;
+    color: #f7f6f3;
 }
 .order-cancel {
-    background: #E64340;
-    color: #ffffff;
+    background: #282828;
+    color: #f7f6f3;
+}
+.order-number-barcode {
+    width: 680rpx;
+    height: 200rpx;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+.order-number-barcode canvas {
+    width: 680rpx;
+    height: 200rpx;
+}
+.order-number-qrcode {
+    width: 600rpx;
+    height: 600rpx;
+    margin: 0 auto;
+    margin-top: -20px;
+}
+.order-number-qrcode canvas {
+    width: 600rpx;
+    height: 600rpx;
+    margin: 0 auto;
+}
+.pay-now {
+    display: block;
+    width: 600rpx;
+    height: 100rpx;
+    line-height: 100rpx;
+    border-radius: 10rpx;
+    background: #ea889f;
+    color: #f7f6f3;
+    margin: 60rpx auto;
+    text-align: center;
 }
 </style>
 
@@ -40,15 +78,21 @@
                     <view class="weui-form-preview__value">{{ order.created_at }}</view>
                 </view>
             </view>
-            <view class="weui-form-preview__hd" wx:if="{{ order.step==1 }}">
+            <view class="weui-form-preview__hd" wx:if="{{ order.step==1 && order.status == 0 && !expired }}">
                 <view class="weui-form-preview__item">
                     <navigator class="order-btn order-edit" 
                     url="edit?shop_id={{ order.shop_item.shop_id }}&item_id={{ order.shop_item.item_id }}&order_id={{ order.id }}&order_date={{ order.order_date }}&order_time={{ order.order_time }}">
-                        编辑
+                        修改
                     </navigator>
                     <navigator class="order-btn order-cancel" @tap="cancel" data-orderid="{{ order.id }}">
                         取消
                     </navigator>
+                </view>
+                <view class="order-number-barcode">
+                    <canvas canvas-id="barcode" />
+                </view>
+                <view class="order-number-qrcode">
+                    <canvas canvas-id="qrcode" />
                 </view>
             </view>
              <view class="weui-form-preview__hd" wx:if="{{ order.step==5 }}">
@@ -60,6 +104,9 @@
                 <view class="weui-form-preview__item" wx:if="{{ order.amount > 0 }}">
                     <view class="weui-form-preview__label">待支付</view>
                     <view class="weui-form-preview__value_in-hd" >￥{{ remain }}</view>
+                    <navigator class="pay-now" url="/pages/orders/pay?id={{ order.id }}">
+                        立即支付
+                    </navigator>
                 </view>
             </view>
         </view>
@@ -70,11 +117,15 @@
 <script>
 import wepy from 'wepy'
 import api from '@/utils/api'
+import util from '@/utils/util'
+import wxbarcode from 'wxbarcode' 
 
 export default class OrdersShow extends wepy.page {
     data = {
         order: null,
-        remain: null
+        remain: null,
+        order_number: null,
+        expired: false,
     }
     async getOrder(id) {
         try {
@@ -86,8 +137,10 @@ export default class OrdersShow extends wepy.page {
             })
             this.order = orderResponse.data
             this.remain = (this.order.amount-this.order.paid).toFixed(2)
+            wxbarcode.barcode('barcode', this.order.order_number, 680, 200);
+            wxbarcode.qrcode('qrcode', this.order.order_number, 600, 600);
+            this.expired = util.isOrderExpired(this.order.order_date_time)
             this.$apply()
-            console.log(this.order)
         } catch (err) {
             console.log(err)
             wepy.showModal({

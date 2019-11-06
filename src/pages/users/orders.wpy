@@ -1,4 +1,7 @@
 <style lang="less">
+.weui-navbar__item.weui-bar__item_on {
+    color: #ea889f;
+}
 .navbar {
     .page,
     .page__bd{
@@ -17,8 +20,8 @@
     .tab-content .weui-form-preview {
         margin-bottom: 8px;
     }
-    .no-record {
-        margin-top:20px;
+    .weui-loadmore__tips_in-line {
+        background-color: #f8f8f8;
     }
 }
 </style>
@@ -33,7 +36,6 @@
                 </view>
                 <view class="weui-tab__panel">
                     <view class="weui-tab__content tab-content" hidden="{{activeIndex != 0}}">
-                        <view wx:if="{{ !orders.length }}" class="no-record">暂无记录！</view>
                         <repeat for="{{ orders }}" key="id" index="index" item="order">
                             <navigator url="/pages/orders/show?id={{ order.id }}">
                                 <view class="weui-form-preview">
@@ -62,34 +64,11 @@
                                 </view>
                             </navigator>
                         </repeat>
+                        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                        </view>
                     </view>
                     <view class="weui-tab__content tab-content" hidden="{{activeIndex != 1}}">
-                        <view wx:if="{{ !orders.length }}" class="no-record">暂无记录！</view>
-                        <repeat for="{{ orders }}" key="id" index="index" item="order">
-                            <view class="weui-form-preview">
-                                <view class="weui-form-preview__bd">
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">订单号</view>
-                                        <view class="weui-form-preview__value">{{ order.order_number }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">预约项目</view>
-                                        <view class="weui-form-preview__value">{{ order.shop_item.item.name }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">预约时间</view>
-                                        <view class="weui-form-preview__value">{{ order.order_date_time }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">创建时间</view>
-                                        <view class="weui-form-preview__value">{{ order.created_at }}</view>
-                                    </view>
-                                </view>
-                            </view>
-                        </repeat>
-                    </view>
-                    <view class="weui-tab__content tab-content" hidden="{{activeIndex != 2}}">
-                        <view wx:if="{{ !orders.length }}" class="no-record">暂无记录！</view>
                         <repeat for="{{ orders }}" key="id" index="index" item="order">
                             <navigator url="/pages/orders/show?id={{ order.id }}">
                                 <view class="weui-form-preview">
@@ -114,60 +93,100 @@
                                 </view>
                             </navigator>
                         </repeat>
+                        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                        </view>
+                    </view>
+                    <view class="weui-tab__content tab-content" hidden="{{activeIndex != 2}}">
+                        <repeat for="{{ orders }}" key="id" index="index" item="order">
+                            <navigator url="/pages/orders/show?id={{ order.id }}">
+                                <view class="weui-form-preview">
+                                    <view class="weui-form-preview__bd">
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">订单号</view>
+                                            <view class="weui-form-preview__value">{{ order.order_number }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">预约项目</view>
+                                            <view class="weui-form-preview__value">{{ order.shop_item.item.name }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">预约时间</view>
+                                            <view class="weui-form-preview__value">{{ order.order_date_time }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">创建时间</view>
+                                            <view class="weui-form-preview__value">{{ order.created_at }}</view>
+                                        </view>
+                                    </view>
+                                </view>
+                            </navigator>
+                        </repeat>
+                        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                        </view>
                     </view>
                     <view class="weui-tab__content tab-content" hidden="{{activeIndex != 3}}">
-                        <view wx:if="{{ !orders.length }}" class="no-record">暂无记录！</view>
                         <repeat for="{{ orders }}" key="id" index="index" item="order">
-                            <view class="weui-form-preview">
-                                <view class="weui-form-preview__bd">
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">订单号</view>
-                                        <view class="weui-form-preview__value">{{ order.order_number }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">预约项目</view>
-                                        <view class="weui-form-preview__value">{{ order.shop_item.item.name }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">预约时间</view>
-                                        <view class="weui-form-preview__value">{{ order.order_date_time }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">创建时间</view>
-                                        <view class="weui-form-preview__value">{{ order.created_at }}</view>
+                            <navigator url="/pages/orders/show?id={{ order.id }}">
+                                <view class="weui-form-preview">
+                                    <view class="weui-form-preview__bd">
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">订单号</view>
+                                            <view class="weui-form-preview__value">{{ order.order_number }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">预约项目</view>
+                                            <view class="weui-form-preview__value">{{ order.shop_item.item.name }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">预约时间</view>
+                                            <view class="weui-form-preview__value">{{ order.order_date_time }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">创建时间</view>
+                                            <view class="weui-form-preview__value">{{ order.created_at }}</view>
+                                        </view>
                                     </view>
                                 </view>
-                            </view>
+                            </navigator>
                         </repeat>
+                        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                        </view>
                     </view>
                     <view class="weui-tab__content tab-content" hidden="{{activeIndex != 4}}">
-                        <view wx:if="{{ !orders.length }}" class="no-record">暂无记录！</view>
                         <repeat for="{{ orders }}" key="id" index="index" item="order">
-                            <view class="weui-form-preview">
-                                <view class="weui-form-preview__bd">
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">订单号</view>
-                                        <view class="weui-form-preview__value">{{ order.order_number }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">预约项目</view>
-                                        <view class="weui-form-preview__value">{{ order.shop_item.item.name }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">预约时间</view>
-                                        <view class="weui-form-preview__value">{{ order.order_date_time }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">创建时间</view>
-                                        <view class="weui-form-preview__value">{{ order.created_at }}</view>
-                                    </view>
-                                    <view class="weui-form-preview__item">
-                                        <view class="weui-form-preview__label">订单状态</view>
-                                        <view class="weui-form-preview__value">{{ order.status_desc }}</view>
+                            <navigator url="/pages/orders/show?id={{ order.id }}">
+                                <view class="weui-form-preview">
+                                    <view class="weui-form-preview__bd">
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">订单号</view>
+                                            <view class="weui-form-preview__value">{{ order.order_number }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">预约项目</view>
+                                            <view class="weui-form-preview__value">{{ order.shop_item.item.name }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">预约时间</view>
+                                            <view class="weui-form-preview__value">{{ order.order_date_time }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">创建时间</view>
+                                            <view class="weui-form-preview__value">{{ order.created_at }}</view>
+                                        </view>
+                                        <view class="weui-form-preview__item">
+                                            <view class="weui-form-preview__label">订单状态</view>
+                                            <view class="weui-form-preview__value">{{ order.status_desc }}</view>
+                                        </view>
                                     </view>
                                 </view>
-                            </view>
+                            </navigator>
                         </repeat>
+                        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                            <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                        </view>
                     </view>
                 </view>
             </view>
@@ -183,17 +202,22 @@ export default class UserOrders extends wepy.page {
     data = {
             tabs: ['全部', '已预约', '待结算', '已完成', '已失效'],
             activeIndex: 0,
-            orders: null,
+            orders: [],
+            step: null,
+            status: null,
+            page: 1,
+            noMoreData: false
     };
 
-    async getOrders(step = null, status = null) {
+    async getOrders() {
         try {
             let params = {}
-            if (step) {
-                params.step = step
+            params.page = this.page
+            if (this.step) {
+                params.step = this.step
             }
-            if (status) {
-                params.status = status
+            if (this.status) {
+                params.status = this.status
             }
             params.include = 'shop_item,shop_item.item,shop_item.shop'
             let ordersResponse = await api.authRequest({
@@ -201,7 +225,12 @@ export default class UserOrders extends wepy.page {
                 data: params
             })
             if (ordersResponse.statusCode == 200) {
-                this.orders = ordersResponse.data.data
+                let orders = ordersResponse.data.data
+                this.orders = this.orders.concat(orders)
+                let pagination = ordersResponse.data.meta.pagination
+                if (pagination.current_page === pagination.total_pages) {
+                    this.noMoreData = true
+                }
                 this.$apply()
             }
         } catch (err) {
@@ -213,24 +242,46 @@ export default class UserOrders extends wepy.page {
         }
     }
 
+    async onReachBottom () {
+      if (this.noMoreData) {
+        return
+      }
+      this.page = this.page + 1
+      await this.getOrders()
+      this.$apply()
+    }
+
     methods = {
         tabClick (e) {
             this.activeIndex = e.currentTarget.id
+            this.orders = []
+            this.page = 1
+            this.noMoreData = false
             switch (this.activeIndex) {
                 case '0':
+                    this.step = null
+                    this.status = null
                     this.getOrders()
                     break
                 case '1':
-                    this.getOrders(1)
+                    this.step = 1
+                    this.status = null
+                    this.getOrders()
                     break
                 case '2':
-                    this.getOrders(5)
+                    this.step = 5
+                    this.status = null
+                    this.getOrders()
                     break
                 case '3':
-                    this.getOrders(7)
+                    this.step = 7
+                    this.status = null
+                    this.getOrders()
                     break
                 case '4':
-                    this.getOrders(null, 1)
+                    this.step = null
+                    this.status = 1
+                    this.getOrders()
                     break
             }
         }
