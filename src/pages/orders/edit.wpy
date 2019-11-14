@@ -96,7 +96,7 @@
     </view>
     <view class="weui-cells weui-cells_after-title">
         <repeat for="{{ orderableTime.order_time }}" key="id" index="index" item="time">
-            <view class="orderable_time" data-index={{index}} data-text="{{ time.time }}" bindtap="chooseTime">
+            <view class="orderable_time" data-index="{{index}}" data-text="{{ time.time }}" data-passed="{{ orderTime.passed }}" bindtap="chooseTime">
                 <view class="{{ timeIndex == index?'active':'' }}{{ time.passed ?'disabled':''}}">
                     <view class="order_times">{{ time.time }}</view>
                     <view class="order_counts">{{ time.count }}/{{ orderableTime.max_number }}</view>
@@ -223,10 +223,6 @@ export default class OrdersEdit extends wepy.page {
                 url: 'orders/order_time?item_id=' + item_id + '&shop_id=' + shop_id + '&order_date=' + order_date,
             })
             let orderableTime = orderableTimeResponse.data
-            var _this = this
-            orderableTime.order_time.forEach(function (time) {
-                time.passed = util.timePassed(_this.orderDate+ ' '+ time.time, util.currentTime(new Date()))
-            })
             this.orderableTime = orderableTime
             this.timeIndex = util.getIndex(this.orderTime, orderableTime.order_time, 'time')
             this.$apply()
@@ -256,7 +252,7 @@ export default class OrdersEdit extends wepy.page {
             this.errors = {}
         },
         chooseTime(e) {
-            if (util.timePassed(this.orderDate + ' ' + e.currentTarget.dataset.text + ':00', util.currentTime(new Date()))) {
+            if (e.currentTarget.dataset.passed) {
                 return false
             }
             this.timeIndex = e.currentTarget.dataset.index

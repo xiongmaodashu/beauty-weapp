@@ -36,6 +36,10 @@
                         <view class="weui-form-preview__label">项目</view>
                         <view class="weui-form-preview__value">{{ account_detail.order.shop_item.item.name }}</view>
                     </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">状态</view>
+                        <view class="weui-form-preview__value">{{ account_detail.status?'已撤销':'已成功' }}</view>
+                    </view>
                 </view>
                 <view class="weui-form-preview__hd">
                     <view class="weui-form-preview__item">

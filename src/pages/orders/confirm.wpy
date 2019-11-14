@@ -153,5 +153,15 @@ export default class OrderConfirm extends wepy.page {
         this.shop_id = options.shop_id
         this.order_id = options.order_id
     }
+
+    async onShow() {
+        let user = await this.$parent.getCurrentUser(true)
+        console.log(user)
+        if (!user.phone) {
+            wepy.navigateTo({
+                url: '/pages/users/phone'
+            })
+        }
+    }
 }
 </script>

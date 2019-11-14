@@ -67,17 +67,25 @@
       user: null,
       grids: [
         {title: '余额', value: 0.00},
-        {title:'积分', value: 0},
-        {title:'等级', value: 1}
+        {title: '积分', value: 0},
+        {title: '等级', value: '普通会员'}
       ]
+    }
+    async getUserInfo() {
+      let userResponse = await api.authRequest({
+        url: 'user'
+      })
+      this.user = userResponse.data
+      this.$$apply()
     }
     async onShow() {
       let accessToken = wepy.getStorageSync('access_token')
 
       if (accessToken) {
-        this.user = await this.$parent.getCurrentUser()
+        this.user = await this.$parent.getCurrentUser(true)
         this.grids[0].value = parseFloat(this.user.balance).toFixed(2)
         this.grids[1].value = this.user.points
+        this.grids[2].value = this.user.group
         this.$apply()
       } else {
         try {

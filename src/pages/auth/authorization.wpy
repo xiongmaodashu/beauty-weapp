@@ -1,13 +1,46 @@
+<style lang="less">
+.logo {
+  display: block;
+  margin: 0 auto;
+  margin-top: 60rpx;
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+}
+.company-name {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 30rpx 20rpx;
+  font-size: 44rpx;
+}
+.request-info {
+  display: block;
+  width: 100%;
+  padding: 20rpx 20rpx 40rpx 20rpx;
+  text-align:center;
+}
+.bind-user-btn {
+  width: 600rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+  border-radius: 10rpx;
+  background: #ea889f;
+  color: #f7f6f3;
+}
+</style>
+
 <template>
     <view class="page__bd">
         <view class="weui-panel__bd">
             <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-                <view class="weui-media-box__title">湖州倍美医疗美容会所</view>
-                <view class="weui-media-box__desc">申请获取您的公开信息（昵称、头像等）</view>
+                <image class="logo" src="/images/logo.jpg" />
+                <h1 class="weui-media-box__title company-name">湖州倍美医疗美容会所</h1>
+                <view class="weui-media-box__desc request-info">申请获取您的公开信息（昵称、头像等）</view>
             </view>
         </view>
         <view class="weui-panel__bd">
-            <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindgetuserinfo">授权获取头像昵称</button>
+            <button wx:if="{{canIUse}}" open-type="getUserInfo" class="bind-user-btn" bindgetuserinfo="bindgetuserinfo">授权获取头像昵称</button>
         </view>
     </view>
 </template>

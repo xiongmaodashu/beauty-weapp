@@ -26,7 +26,7 @@
     width:25%;
     height: 100rpx;
     padding:0 5rpx;
-    margin-bottom:20rpx;
+    margin-bottom:30rpx;
     display: inline-block;
     box-sizing: border-box;
 }
@@ -99,11 +99,11 @@
         <text wx:if="{{ errors.order_time }}" class="weui-cells__tips error-message">{{ errors.order_time }}</text>
     </view>
     <view class="weui-cells weui-cells_after-title">
-        <repeat for="{{ orderableTime.order_time }}" key="id" index="index" item="time">
-            <view class="orderable_time" data-index={{index}} data-text="{{ time.time }}" bindtap="chooseTime">
-                <view class="{{ timeIndex == index?'active':'' }}{{ time.passed ?'disabled':''}}">
-                    <view class="order_times">{{ time.time }}</view>
-                    <view class="order_counts">{{ time.count }}/{{ orderableTime.max_number }}</view>
+        <repeat for="{{ orderableTime.order_time }}" key="id" index="index" item="orderTime">
+            <view class="orderable_time" data-index="{{index}}" data-passed="{{ orderTime.passed }}" data-text="{{ orderTime.time }}" bindtap="chooseTime">
+                <view class="{{ timeIndex == index?'active':'' }}{{ orderTime.passed ?'disabled':''}}">
+                    <view class="order_times">{{ orderTime.time }}</view>
+                    <view class="order_counts">{{ orderTime.count }}/{{ orderableTime.max_number }}</view>
                 </view>
             </view>
         </repeat>
@@ -128,24 +128,25 @@ import api from '@/utils/api'
 import util from '@/utils/util'
 
 export default class OrdersCreate extends wepy.page {
-    config = {
-        navigationBarTitleText: '项目预约'
-    }
+  config = {
+    navigationBarTitleText: '项目预约'
+}
 
-    data = {
-        shop_id: null,
-        item_id: null,
-        orderableItems: null,
-        itemIndex: 0,
-        orderableDate: null,
-        orderableTime: null,
-        orderDate: util.today(new Date()),
-        orderTime: null,
-        dateIndex: 0,
-        timeIndex: null,
-        remark: '',
-        errors: {}
-    }
+  data = {
+    user: null,
+    shop_id: null,
+    item_id: null,
+    orderableItems: null,
+    itemIndex: 0,
+    orderableDate: null,
+    orderableTime: null,
+    orderDate: util.today(new Date()),
+    orderTime: null,
+    dateIndex: 0,
+    timeIndex: null,
+    remark: '',
+    errors: {}
+}
 
     async getOrderableItems(shop_id, item_id = null) {
         try {
@@ -199,10 +200,6 @@ export default class OrdersCreate extends wepy.page {
                 url: 'orders/order_time?item_id=' + item_id + '&shop_id=' + shop_id + '&order_date=' + order_date,
             })
             let orderableTime = orderableTimeResponse.data
-            var _this = this
-            orderableTime.order_time.forEach(function (time) {
-                time.passed = util.timePassed(_this.orderDate+ ' '+ time.time, util.currentTime(new Date()))
-            })
             this.orderableTime = orderableTime
             this.$apply()
         } catch (err) {
@@ -229,7 +226,7 @@ export default class OrdersCreate extends wepy.page {
             this.errors = {}
         },
         chooseTime(e) {
-            if (util.timePassed(this.orderDate + ' ' + e.currentTarget.dataset.text + ':00', util.currentTime(new Date()))) {
+            if (e.currentTarget.dataset.passed) {
                 return false
             }
             this.timeIndex = e.currentTarget.dataset.index
@@ -265,7 +262,34 @@ export default class OrdersCreate extends wepy.page {
             this.getOrderableItems(options.shop_id)
             
         }
-       
+    }
+    
+    async onShow() {
+        let accessToken = wepy.getStorageSync('access_token')
+
+        if (accessToken) {
+            this.user = await this.$parent.getCurrentUser()
+            this.$apply()
+        } else {
+            try {
+                let authResponse = await api.login()
+
+                // 登录成功返回上一页
+                if (authResponse.statusCode === 201) {
+                    // wepy.navigateBack()
+                } else {
+                    wx.navigateTo({
+                    url: '/pages/auth/authorization'
+                    })
+                }
+            } catch (err) {
+                wepy.showModal({
+                    title: '提示',
+                    content: '服务器错误，请联系管理员'
+                })
+            }
+        }
+        
     }
 }
 </script>

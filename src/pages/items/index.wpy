@@ -1,4 +1,7 @@
 <style>
+  swiper {
+    height: 400rpx;
+  }
   .index-banner {
     margin-bottom: 15rpx;
   }
@@ -83,7 +86,7 @@
     margin-bottom: 18rpx;
     color: #282828;
   }
-  .index-footer-content navigator {
+  .index-footer-content .footer-navigtion {
     display: block;
     width: 120rpx;
     height: 56rpx;
@@ -92,6 +95,9 @@
     background: #282828;
     color: #f7f6f3;
     padding: 6rpx 14rpx;
+  }
+  .weui-search-bar__cancel-btn {
+    color: #ea889f;
   }
 </style>
 <template>
@@ -113,13 +119,21 @@
       <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
   </view>
   <view wx:if="{{!isSearch}}">
-    <view class="index-banner">
-      <image src="/images/banner02.jpg" mode="widthFix" style="width:100%;max-height:100%;" />
-    </view>
+    <swiper indicator-dots="{{indicatorDots}}"
+        autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
+        <repeat for="{{ swiperImages }}" item="swiperImage">
+          <swiper-item>
+            <view class="index-banner">
+                <image src="{{swiperImage}}" mode="widthFix" style="width:100%;max-height:100%;" />
+            </view>
+          </swiper-item>
+        </repeat>
+    </swiper>
+    
 
     <view class="weui-flex index-nav">
         <view class="weui-flex__item">
-          <navigator class="index-nav" url="/pages/common/success">
+          <navigator class="index-nav" url="/pages/articles/show?id={{weappSettings.BRAND_INTRODUCTION}}">
             <image src="/images/shop.png" />
             <view class="index-nav-title">品牌介绍</view>
           </navigator>
@@ -174,9 +188,9 @@
     <view class="weui-flex index-footer">
       <image src="/images/map1.png" />
       <view class="index-footer-content">
-        <view>营业时间：9:00-21:00</view>
-        <view>地址：浙江省湖州市吴兴区人民路465号西北60米</view>
-        <navigator @tap="navigation">导航</navigator>
+        <view>营业时间：{{shop.opening_time}}-{{shop.closing_time}}</view>
+        <view>地址：{{shop.province+shop.city+shop.district+shop.address}}</view>
+        <view class="footer-navigtion" @tap="navigation">导航</view>
       </view>
     </view>
   </view>
@@ -204,7 +218,16 @@ export default class Index extends wepy.page {
         page: 1,
         isSearch: false,
         searchItems: [],
-        hotItems: []
+        hotItems: [],
+        shop: null,
+        weappSettings: null,
+        swiperImages: null,
+
+        indicatorDots: true,
+        vertical: false,
+        autoplay: false,
+        interval: 2000,
+        duration: 500
       };
 
       async getItems(page = 1) {
@@ -232,7 +255,7 @@ export default class Index extends wepy.page {
           let hotItemsResponse = await api.request({
             url: 'items/category',
             data: {
-              badge: '2'
+              isHot: 1
             }
           })
           let hotItems = hotItemsResponse.data.data
@@ -267,9 +290,47 @@ export default class Index extends wepy.page {
         }
     }
 
+    async getShop() {
+        try {
+          let shopResponse = await api.request({
+            url: 'shops/1',
+          })
+          this.shop = shopResponse.data
+          this.$apply()
+        } catch (err) {
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
+        }
+      }
+
+      async getWeappSettings() {
+        try {
+          let settingsResponse = await api.request({
+            url: 'settings/weapp'
+          })
+          this.weappSettings = settingsResponse.data
+          this.$apply()
+        } catch (err) {
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
+        }
+      }
+
+      setSwiper() {
+        this.swiperImages = this.weappSettings.SWIPER_IMAGES.split(',')
+        this.$apply()
+      }
+
       async onLoad() {
         this.getHotItems()
         this.getItems()
+        this.getShop()
+        await this.getWeappSettings()
+        this.setSwiper()
       }
 
       methods = {
@@ -295,10 +356,11 @@ export default class Index extends wepy.page {
         },
         callUs() {
           wx.makePhoneCall ({
-            phoneNumber: '05722222255'
+            phoneNumber: this.shop.telephone
           })
         },
         navigation() {
+          let _this = this
           wx.getLocation({
             type: 'gcj02',
             success: function (res) {
@@ -307,8 +369,8 @@ export default class Index extends wepy.page {
               wx.openLocation({
                 latitude: latitude,
                 longitude: longitude,
-                name: "倍美医疗美容",
-                address:"浙江省湖州市吴兴区人民路465号西北60米",
+                name: _this.weappSettings.COMPANY_NAME,
+                address:_this.shop.province+_this.shop.city+_this.shop.district+_this.shop.address,
                 scale: 18
               })
             }

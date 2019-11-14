@@ -11,5 +11,7 @@
 	"appid": "wxd2860f03f311d471",
 	"projectname": "beauty-weapp",
 	"miniprogramRoot": "dist/",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
 	"condition": {}
 }

@@ -21,7 +21,7 @@
         margin-bottom: 8px;
     }
     .weui-loadmore__tips_in-line {
-        background-color: #f8f8f8;
+        background-color: #f5f5f5;
     }
 }
 </style>

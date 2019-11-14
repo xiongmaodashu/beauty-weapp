@@ -55,14 +55,14 @@
             </view>
             <view class="weui-msg__opr-area success-msg-btn">
                 <view class="weui-btn-area">
-                    <navigator url="" class="message-btn msg-btn-success">{{ action1_name }}</navigator>
+                    <navigator url="{{ action1_url }}" class="message-btn msg-btn-success">{{ action1_name }}</navigator>
                     <navigator url="{{ action2_url }}" class="message-btn msg-btn-default">{{ action2_name }}</navigator>
                 </view>
             </view>
             <view class="weui-msg__extra-area">
                 <view class="weui-footer">
                     <view class="weui-footer__links">
-                        <navigator url="{{ footer_url }}" class="weui-footer__link">{{ footer_text }}</navigator>
+                        <view class="weui-footer__link" @tap="backToIndex">{{ footer_text }}</view>
                     </view>
                     <view class="weui-footer__text">Copyright © 2019 湖州倍美医疗</view>
                 </view>
@@ -83,7 +83,6 @@ export default class CommonSuccess extends wepy.page {
         action2_name: null,
         action2_url: null,
         footer_text: '返回首页',
-        footer_url: '/pages/items/index'
     }
     message(type) {
         switch (type) {
@@ -91,7 +90,7 @@ export default class CommonSuccess extends wepy.page {
                 this.message_title = '预约成功'
                 this.message_desc = '请您安排好时间，提前到店确认，享受我们的服务。'
                 this.action1_name = '继续预约'
-                this.action2_url = '/pages/orders/create'
+                this.action1_url = '/pages/orders/create?shop_id=1'
                 this.action2_name = '查看订单'
                 this.action2_url = '/pages/users/orders'
                 this.$apply()
@@ -100,7 +99,7 @@ export default class CommonSuccess extends wepy.page {
                 this.message_title = '修改成功'
                 this.message_desc = '请您安排好时间，提前到店确认，享受我们的服务。'
                 this.action1_name = '继续预约'
-                this.action2_url = '/pages/orders/create'
+                this.action1_url = '/pages/orders/create?shop_id=1'
                 this.action2_name = '查看订单'
                 this.action2_url = '/pages/users/orders'
                 this.$apply()
@@ -109,7 +108,7 @@ export default class CommonSuccess extends wepy.page {
                 this.message_title = '支付成功'
                 this.message_desc = '感谢您的支持，欢迎再次光临。'
                 this.action1_name = '继续预约'
-                this.action2_url = '/pages/orders/create'
+                this.action1_url = '/pages/orders/create'
                 this.action2_name = '查看订单'
                 this.action2_url = '/pages/users/orders'
                 this.$apply()
@@ -118,12 +117,19 @@ export default class CommonSuccess extends wepy.page {
                 this.message_title = '成功'
                 this.message_desc = '您的请求已成功处理。'
                 this.action1_name = '返回首页'
-                this.action2_url = '/pages/items/index'
+                this.action1_url = '/pages/items/index'
                 this.action2_name = '查看订单'
                 this.action2_url = '/pages/users/orders'
                 this.$apply()
                 break
 
+        }
+    }
+    methods = {
+        backToIndex() {
+            wx.switchTab({
+                url: '/pages/items/index',
+            })
         }
     }
     onLoad(options) {

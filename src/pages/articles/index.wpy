@@ -1,0 +1,205 @@
+<style lang="less">
+.article {
+    display: block;
+    padding: 40rpx 20px;
+    border-bottom: 1px solid #dfdfdf;
+}
+.article-title {
+    line-height: 60rpx;
+    overflow: hidden;
+}
+.badge {
+    width: auto;
+    height: 56rpx;
+    line-height: 54rpx;
+    padding: 2rpx 18rpx;
+    border-radius: 10rpx;
+    background: #f59134;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 32rpx;
+    margin-right: 20rpx;
+}
+.article-title-text {
+    display: inline-block;
+}
+.article-date, .article-category {
+    display: inline-block;
+    width: 50%;
+    margin-top: 30rpx;
+    font-size:28rpx;
+    color: #aaaaaa;
+}
+.article-date {
+    text-align: right;
+}
+.article-category {
+    text-align: left;
+}
+.weui-loadmore__tips_in-line {
+    background-color: #f5f5f5;
+}
+</style>
+
+<template>
+    <view class="navbar page">
+        <view class="page__bd">
+            <view class="weui-search-bar">
+                <view class="weui-search-bar__form">
+                    <view class="weui-search-bar__box">
+                        <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+                        <input type="text" class="weui-search-bar__input" placeholder="搜索" value="{{inputVal}}" focus="{{inputShowed}}" bindinput="inputTyping" />
+                        <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
+                            <icon type="clear" size="14"></icon>
+                        </view>
+                    </view>
+                    <label class="weui-search-bar__label" hidden="{{inputShowed}}" bindtap="showInput">
+                        <icon class="weui-icon-search" type="search" size="14"></icon>
+                        <view class="weui-search-bar__text">搜索</view>
+                    </label>
+                </view>
+                <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
+            </view>
+            <view  wx:if="{{!isSearch}}">
+                <view class="weui-cells weui-cells_after-title">
+                    <repeat for="{{ articles }}" key="id" index="index" item="article">
+                        <navigator url="/pages/articles/show?id={{article.id}}" class="article" hover-class="weui-cell_active">
+                            <view class="page__title article-title">
+                                <view class="article-title-text"><view class="badge" wx:if="{{article.is_top}}">置顶</view>{{ article.title }}</view>
+                            </view>
+                            <view class="article-category">{{ article.article_category.name }}</view>
+                            <view class="article-date">{{ article.created_at }}</view>
+                        </navigator>
+                    </repeat>
+                </view>
+                <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                    <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                </view>
+            </view>
+            <view  wx:else>
+                <view class="weui-cells weui-cells_after-title">
+                    <repeat for="{{ searchArticles }}" key="id" index="index" item="article">
+                        <navigator url="/pages/articles/show?id={{article.id}}" class="article" hover-class="weui-cell_active">
+                            <view class="page__title article-title">
+                                <view class="article-title-text"><view class="badge" wx:if="{{article.is_top}}">置顶</view>{{ article.title }}</view>
+                            </view>
+                            <view class="article-category">{{ article.article_category.name }}</view>
+                            <view class="article-date">{{ article.created_at }}</view>
+                        </navigator>
+                    </repeat>
+                </view>
+                <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
+                    <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+
+export default class ArticlesIndex extends wepy.page {
+    config = {
+      enablePullDownRefresh: true
+    }
+
+    data = {
+        articles: [],
+        noMoreData: false,
+        page: 1,
+        inputShowed: false,
+        inputVal: '',
+        isSearch: false,
+        searchArticles: []
+    }
+
+    async getArticles(page = 1, reset = false) {
+        let params = {}
+        params.page = page
+        params.include = 'article_category'
+        try {
+            let articlesResponse = await api.request({
+                url: 'articles',
+                data: params
+            })
+            let articles = articlesResponse.data.data
+            this.articles = reset ? articles : this.articles.concat(articles)
+            let pagination = articlesResponse.data.meta.pagination
+            if (pagination.current_page === pagination.total_pages) {
+                this.noMoreData = true
+            }
+            this.$apply()
+        } catch (err) {
+            wepy.showModal({
+                title: '提示',
+                content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+
+    async search(keyword) {
+        try {
+            let searchResponse = await api.request({
+                url: 'articles/search',
+                data: {
+                    keyword: keyword
+                }
+            })
+            let searchArticles = searchResponse.data.data
+            this.searchArticles = searchArticles
+            this.$apply()
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+            })
+        }
+    }
+
+    async onPullDownRefresh() {
+      this.noMoreData = false
+      this.page = 1
+      await this.getArticles(1, true)
+      wepy.stopPullDownRefresh()
+    }
+
+    async onReachBottom () {
+      if (this.noMoreData) {
+        return
+      }
+      this.page = this.page + 1
+      await this.getArticles(this.page)
+      this.$apply()
+    }
+
+    methods = {
+        showInput () {
+          this.inputShowed = true
+          this.isSearch = true
+        },
+        hideInput () {
+          this.inputVal = ''
+          this.inputShowed = false
+          this.isSearch = false
+          this.searchArticles = []
+        },
+        clearInput () {
+          this.inputVal = ''
+          this.searchArticles = []
+        },
+        inputTyping (e) {
+          if (e.detail.cursor == e.detail.value.length) {
+              this.inputVal = e.detail.value
+              this.search(this.inputVal)
+          }
+        },
+    }
+
+    onLoad(){
+        this.getArticles(1)
+    }
+}
+</script>

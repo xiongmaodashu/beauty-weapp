@@ -55,6 +55,8 @@ export default class UserMe extends wepy.app {
       'pages/orders/confirm',
       'pages/orders/show',
       'pages/orders/edit',
+      'pages/articles/index',
+      'pages/articles/show',
       'pages/orders/pay',
       'pages/users/me',
       'pages/users/edit',
@@ -73,38 +75,47 @@ export default class UserMe extends wepy.app {
       navigationBarTextStyle: 'black'
     },
     tabBar: {
+      color: '#aaaaaa',
+      selectedColor: '#ea889f ',
       list: [{
         pagePath: 'pages/items/index',
         text: '首页',
         iconPath: 'images/index.png',
         selectedIconPath: 'images/index_selected.png'
-      },{
+      }, {
         pagePath: 'pages/items/category',
         text: '分类',
         iconPath: 'images/category.png',
         selectedIconPath: 'images/category_selected.png'
-      },
-       {
+      }, {
+        pagePath: 'pages/articles/index',
+        text: '资讯',
+        iconPath: 'images/article.png',
+        selectedIconPath: 'images/article_selected.png'
+      }, {
         pagePath: 'pages/users/me',
         text: '我的',
         iconPath: 'images/user.png',
         selectedIconPath: 'images/user_selected.png'
-      }],
-      color: '#aaaaaa',
-      selectedColor: '#ea889f '
+      }]
+    },
+    "permission": {
+    　　"scope.userLocation": {
+    　　　　desc: '你的位置信息将用于小程序导航'
+    　　}
     }
   }
 
-  async getCurrentUser () {
+
+  async getCurrentUser (refresh = false) {
     if (!this.checkLogin()) {
       return null
     }
-
     let user = wepy.getStorageSync('user')
 
     try {
-      // 登录了但是缓存中没有，请求接口获取
-      if (!user) {
+      // 登录了但是缓存中没有，请求接口获取 或 请求刷新
+      if (!user || refresh) {
         let userResponse = await api.authRequest('user')
         // 状态码为 200 表示请求成功
         if (userResponse.statusCode === 200) {
