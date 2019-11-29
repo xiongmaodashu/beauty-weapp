@@ -1,7 +1,7 @@
 <style lang="less">
 @import 'style/weui.less';
 page{
-  background-color: #f5f5f5;
+  background-color: #f8f8f8;
   font-size: 16px;
 }
 .page__hd {

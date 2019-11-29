@@ -1,4 +1,15 @@
-<style>
+<style lang="less">
+  .weui-search-bar {
+    background: #f8f8f8;
+    border: 0;
+    .weui-search-bar__form {
+      border: 0;
+
+      .weui-search-bar__label {
+        border-radius: 20rpx;
+      }
+    }
+  }
   swiper {
     height: 400rpx;
   }
@@ -6,20 +17,42 @@
     margin-bottom: 15rpx;
   }
   .index-nav {
-    margin:12rpx auto;
-    padding:5rpx;
-    text-align: center;
-  }
-  .index-nav-title {
-    font-size:30rpx;
-    color: #aaaaaa;
-  }
-  .hot-item-box, .search-result {
-    width: 700rpx;
-    height: 350rpx;
+    width: 90%;
     margin:30rpx auto;
-    box-shadow: 1px 1px 8px rgba(234,136,159, 0.2);
+    padding:20rpx 0;
+    text-align: center;
+    background: #ffffff;
+
+    .index-nav-title {
+      font-size:30rpx;
+      color: #282828;
+      font-size: 28rpx;
+    }
   }
+  
+  .hot-items {
+    width: 90%;
+    background: #ffffff;
+    margin: 0 auto;
+    padding-top: 30rpx;
+
+    .hot-item-box, .search-result {
+      width: 700rpx;
+      height: 350rpx;
+      margin:30rpx auto 0 auto;
+      // box-shadow: 1px 1px 8px rgba(234,136,159, 0.2);
+    }
+
+  }
+
+  .all-items {
+    width: 90%;
+    background: #ffffff;
+    margin: 0 auto;
+    padding-top: 30rpx;
+  }
+  
+  
   .item-box {
     width: 50%;
     height: 450rpx;
@@ -62,7 +95,7 @@
     margin: 0 auto;
     font-size: 40rpx;
     color: #ea889f;
-    background: #f5f5f5;
+    background: #ffffff;
   }
   .index-footer {
     width: 100%;
@@ -133,56 +166,59 @@
 
     <view class="weui-flex index-nav">
         <view class="weui-flex__item">
-          <navigator class="index-nav" url="/pages/articles/show?id={{weappSettings.BRAND_INTRODUCTION}}">
+          <navigator class="index-nav-item" url="/pages/articles/show?id={{weappSettings.BRAND_INTRODUCTION}}">
             <image src="/images/shop.png" />
             <view class="index-nav-title">品牌介绍</view>
           </navigator>
         </view>
         <view class="weui-flex__item">
-          <view class="index-nav" @tap="callUs">
+          <view class="index-nav-item" @tap="callUs">
             <image src="/images/tel.png" />
             <view class="index-nav-title">联系我们</view>
           </view>
         </view>
         <view class="weui-flex__item">
-          <navigator class="index-nav" url="/pages/orders/create?shop_id=1">
+          <navigator class="index-nav-item" url="/pages/orders/create?shop_id=1">
             <image src="/images/order.png" />
             <view class="index-nav-title">在线预约</view>
           </navigator>
         </view>
         <view class="weui-flex__item">
-          <view class="index-nav" @tap="navigation">
+          <view class="index-nav-item" @tap="navigation">
             <image src="/images/location.png" />
             <view class="index-nav-title">门店导航</view>
           </view>
         </view>
     </view>
     
-    <view class="beauty-box-header">
-      <view class="beauty-box-title">热门项目</view>
+    <view class="hot-items">
+      <view class="beauty-box-header">
+        <view class="beauty-box-title">热门项目</view>
+      </view>
+      <view style="overflow: hidden;">
+        <repeat for="{{ hotItems }}" key="id" index="index" item="item">
+          <view class="hot-item-box">
+            <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box_appmsg item-content" hover-class="weui-cell_active">
+              <image src="{{ item.thumbnail }}" class="item-thumbnail" mode="widthFix" />
+            </navigator>
+          </view>
+        </repeat>
+      </view>
     </view>
-    <view style="overflow: hidden;">
-      <repeat for="{{ hotItems }}" key="id" index="index" item="item">
-        <view class="hot-item-box">
-          <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box_appmsg item-content" hover-class="weui-cell_active">
-            <image src="{{ item.thumbnail }}" class="item-thumbnail" mode="widthFix" />
-          </navigator>
-        </view>
-      </repeat>
-    </view>
-    
-    <view class="beauty-box-header">
-        <view class="beauty-box-title">全部项目</view>
-    </view>
-    <view style="overflow: hidden;">
-      <repeat for="{{ items }}" key="id" index="index" item="item">
-        <view class="item-box">
-          <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box_appmsg item-content" hover-class="weui-cell_active">
-            <image src="{{ item.thumbnail }}" class="item-thumbnail" />
-            <view style="width:100%;text-align:center" class="item-name">{{ item.name }}</view>
-          </navigator>
-        </view>
-      </repeat>
+    <view class="all-items">
+      <view class="beauty-box-header">
+          <view class="beauty-box-title">全部项目</view>
+      </view>
+      <view style="overflow: hidden;">
+        <repeat for="{{ items }}" key="id" index="index" item="item">
+          <view class="item-box">
+            <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box_appmsg item-content" hover-class="weui-cell_active">
+              <image src="{{ item.thumbnail }}" class="item-thumbnail" />
+              <view style="width:100%;text-align:center" class="item-name">{{ item.name }}</view>
+            </navigator>
+          </view>
+        </repeat>
+      </view>
     </view>
 
     <view class="weui-flex index-footer">
