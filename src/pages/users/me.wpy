@@ -6,7 +6,7 @@
   border: 0;
 }
 .userinfo-header {
-  background: url('https://img.yzcdn.cn/upload_files/2019/01/31/Fp3kIohim8ZiB1yLepoMMW8is_qY.png');
+  background: url('http://beauty.test/images/userinfo-bg.png');
   padding: 30rpx 0;
 
   .avatar {
@@ -17,6 +17,9 @@
 
   .weui-cell__bd {
     padding-left: 30rpx;
+  }
+  .user-nickname {
+    color: #ffffff;
   }
 }
 
@@ -85,7 +88,7 @@
             <image class="avatar" src="{{ user.avatar }}" style="width:100px;height:100px"/>
           </view>
           <view class="weui-cell__bd">
-            <view>{{ user.nickname }}</view>
+            <view class="user-nickname">{{ user.nickname }}</view>
           </view>
           <view class="weui-cell__ft weui-cell__ft_in-access"></view>
         </navigator>
