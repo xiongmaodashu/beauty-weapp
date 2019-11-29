@@ -1,137 +1,136 @@
 <style lang="less">
-  .weui-search-bar {
-    background: #f8f8f8;
+.weui-search-bar {
+  background: #f8f8f8;
+  border: 0;
+  .weui-search-bar__form {
     border: 0;
-    .weui-search-bar__form {
-      border: 0;
 
-      .weui-search-bar__label {
-        border-radius: 20rpx;
-      }
+    .weui-search-bar__label {
+      border-radius: 20rpx;
     }
   }
-  swiper {
-    height: 400rpx;
-  }
-  .index-banner {
-    margin-bottom: 15rpx;
-  }
-  .index-nav {
-    width: 90%;
-    margin:30rpx auto;
-    padding:20rpx 0;
-    text-align: center;
-    background: #ffffff;
+}
+swiper {
+  height: 400rpx;
+}
+.index-banner {
+  margin-bottom: 15rpx;
+}
+.index-nav {
+  width: 90%;
+  margin: 30rpx auto;
+  padding: 20rpx 0;
+  text-align: center;
+  background: #ffffff;
 
-    .index-nav-title {
-      font-size:30rpx;
-      color: #282828;
-      font-size: 28rpx;
-    }
+  .index-nav-title {
+    font-size: 30rpx;
+    color: #282828;
+    font-size: 28rpx;
   }
-  
-  .hot-items {
-    width: 90%;
-    background: #ffffff;
-    margin: 0 auto;
-    padding-top: 30rpx;
+}
 
-    .hot-item-box, .search-result {
-      width: 700rpx;
-      height: 350rpx;
-      margin:30rpx auto 0 auto;
-      // box-shadow: 1px 1px 8px rgba(234,136,159, 0.2);
-    }
+.hot-items {
+  width: 90%;
+  background: #ffffff;
+  margin: 0 auto;
+  padding-top: 30rpx;
 
-  }
-
-  .all-items {
-    width: 90%;
-    background: #ffffff;
-    margin: 0 auto;
-    padding-top: 30rpx;
-  }
-  
-  
-  .item-box {
-    width: 50%;
-    height: 450rpx;
-    padding: 14rpx 20rpx;
-    float: left;
-    overflow:hidden;
-    box-sizing: border-box;
-    margin-bottom: 10rpx;
-  }
-  .item-content {
-    display: block;
-    width: 100%;
-    height: 100%;
-    box-shadow: 1px 1px 8px rgba(234,136,159, 0.2);
-    background: #ffffff;
-    overflow: hidden;
-  }
-  .item-thumbnail {
+  .hot-item-box,
+  .search-result {
     width: 700rpx;
     height: 350rpx;
+    margin: 30rpx auto 0 auto;
+    // box-shadow: 1px 1px 8px rgba(234,136,159, 0.2);
   }
-  .item-name {
-    color: #ea889f;
-  }
-  .index-nav>view image {
-    width: 70rpx;
-    height: 70rpx;
-  }
-  .beauty-box-header {
-    width:70%;
-    margin: 70rpx auto;
-    padding: 10rpx 0;
-    text-align: center;
-    border: 3rpx solid #e5e5e5;
-  }
-  .beauty-box-title {
-    width: 200rpx;
-    position: relative;
-    top: -40rpx;
-    margin: 0 auto;
-    font-size: 40rpx;
-    color: #ea889f;
-    background: #ffffff;
-  }
-  .index-footer {
-    width: 100%;
-    height: 360rpx;
-    margin-top: 60rpx;
-    position: relative;
-  }
-  .index-footer image {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 180px;
-  }
-  .index-footer-content {
-    width: 50%;
-    position: absolute;
-    top: 60rpx;
-    left:48rpx;
-  }
-  .index-footer-content view {
-    margin-bottom: 18rpx;
-    color: #282828;
-  }
-  .index-footer-content .footer-navigtion {
-    display: block;
-    width: 120rpx;
-    height: 56rpx;
-    line-height: 56rpx;
-    text-align: center;
-    background: #282828;
-    color: #f7f6f3;
-    padding: 6rpx 14rpx;
-  }
-  .weui-search-bar__cancel-btn {
-    color: #ea889f;
-  }
+}
+
+.all-items {
+  width: 90%;
+  background: #ffffff;
+  margin: 0 auto;
+  padding-top: 30rpx;
+}
+
+.item-box {
+  width: 50%;
+  height: 450rpx;
+  padding: 14rpx 20rpx;
+  float: left;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin-bottom: 10rpx;
+}
+.item-content {
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-shadow: 1px 1px 8px rgba(234, 136, 159, 0.2);
+  background: #ffffff;
+  overflow: hidden;
+}
+.item-thumbnail {
+  width: 700rpx;
+  height: 350rpx;
+}
+.item-name {
+  color: #ea889f;
+}
+.index-nav > view image {
+  width: 70rpx;
+  height: 70rpx;
+}
+.beauty-box-header {
+  width: 70%;
+  margin: 70rpx auto;
+  padding: 10rpx 0;
+  text-align: center;
+  border: 3rpx solid #e5e5e5;
+}
+.beauty-box-title {
+  width: 200rpx;
+  position: relative;
+  top: -40rpx;
+  margin: 0 auto;
+  font-size: 40rpx;
+  color: #ea889f;
+  background: #ffffff;
+}
+.index-footer {
+  width: 100%;
+  height: 360rpx;
+  margin-top: 60rpx;
+  position: relative;
+}
+.index-footer image {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 180px;
+}
+.index-footer-content {
+  width: 50%;
+  position: absolute;
+  top: 60rpx;
+  left: 48rpx;
+}
+.index-footer-content view {
+  margin-bottom: 18rpx;
+  color: #282828;
+}
+.index-footer-content .footer-navigtion {
+  display: block;
+  width: 120rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  background: #282828;
+  color: #f7f6f3;
+  padding: 6rpx 14rpx;
+}
+.weui-search-bar__cancel-btn {
+  color: #ea889f;
+}
 </style>
 <template>
 <view class="page__bd">
@@ -243,175 +242,195 @@
 </template>
 
 <script>
-    import wepy from 'wepy'
-    import api from '@/utils/api'
+import wepy from 'wepy';
+import api from '@/utils/api';
 
 export default class Index extends wepy.page {
-      data = {
-        inputShowed: false,
-        inputVal: '',
-        items: [],
-        page: 1,
-        isSearch: false,
-        searchItems: [],
-        hotItems: [],
-        shop: null,
-        weappSettings: null,
-        swiperImages: null,
+  data = {
+    inputShowed: false,
+    inputVal: '',
+    items: [],
+    page: 1,
+    isSearch: false,
+    searchItems: [],
+    hotItems: [],
+    shop: null,
+    weappSettings: null,
+    swiperImages: null,
 
-        indicatorDots: true,
-        vertical: false,
-        autoplay: false,
-        interval: 2000,
-        duration: 500
-      };
+    indicatorDots: true,
+    vertical: false,
+    autoplay: false,
+    interval: 2000,
+    duration: 500
+  };
 
-      async getItems(page = 1) {
-        try {
-          let itemsResponse = await api.request({
-            url: 'items',
-            data: {
-              page: page,
-              include: 'item_category'
-            }
-          })
-          let items = itemsResponse.data.data
-          this.items = this.items.concat(items)
-          this.$apply()
-        } catch (err) {
-          wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-          })
+  async getItems(page = 1) {
+    try {
+      let itemsResponse = await api.request({
+        url: 'items',
+        data: {
+          page: page,
+          include: 'item_category'
         }
-      }
-
-      async getHotItems() {
-        try {
-          let hotItemsResponse = await api.request({
-            url: 'items/category',
-            data: {
-              isHot: 1
-            }
-          })
-          let hotItems = hotItemsResponse.data.data
-          this.hotItems = hotItems
-          this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-          })
-        }
-      }
-
-      async search(keyword) {
-        try {
-            let searchResponse = await api.request({
-                url: 'items/search',
-                data: {
-                    keyword: keyword
-                }
-            })
-            let searchItems = searchResponse.data.data
-            this.searchItems = searchItems
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
-        }
+      });
+      let items = itemsResponse.data.data;
+      this.items = this.items.concat(items);
+      this.$apply();
+    } catch (err) {
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
+  }
 
-    async getShop() {
-        try {
-          let shopResponse = await api.request({
-            url: 'shops/1',
-          })
-          this.shop = shopResponse.data
-          this.$apply()
-        } catch (err) {
-          wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-          })
+  async getHotItems() {
+    try {
+      let hotItemsResponse = await api.request({
+        url: 'items/category',
+        data: {
+          isHot: 1
         }
-      }
-
-      async getWeappSettings() {
-        try {
-          let settingsResponse = await api.request({
-            url: 'settings/weapp'
-          })
-          this.weappSettings = settingsResponse.data
-          this.$apply()
-        } catch (err) {
-          wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-          })
-        }
-      }
-
-      setSwiper() {
-        this.swiperImages = this.weappSettings.SWIPER_IMAGES.split(',')
-        this.$apply()
-      }
-
-      async onLoad() {
-        this.getHotItems()
-        this.getItems()
-        this.getShop()
-        await this.getWeappSettings()
-        this.setSwiper()
-      }
-
-      methods = {
-        showInput () {
-          this.inputShowed = true
-          this.isSearch = true
-        },
-        hideInput () {
-          this.inputVal = ''
-          this.inputShowed = false
-          this.isSearch = false
-          this.searchItems = []
-        },
-        clearInput () {
-          this.inputVal = ''
-          this.searchItems = []
-        },
-        inputTyping (e) {
-          if (e.detail.cursor == e.detail.value.length) {
-              this.inputVal = e.detail.value
-              this.search(this.inputVal)
-          }
-        },
-        callUs() {
-          wx.makePhoneCall ({
-            phoneNumber: this.shop.telephone
-          })
-        },
-        navigation() {
-          let _this = this
-          wx.getLocation({
-            type: 'gcj02',
-            success: function (res) {
-              var latitude = res.latitude
-              var longitude = res.longitude
-              wx.openLocation({
-                latitude: latitude,
-                longitude: longitude,
-                name: _this.weappSettings.COMPANY_NAME,
-                address:_this.shop.province+_this.shop.city+_this.shop.district+_this.shop.address,
-                scale: 18
-              })
-            }
-          })
-        }
-      }
+      });
+      let hotItems = hotItemsResponse.data.data;
+      this.hotItems = hotItems;
+      this.$apply();
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
+  }
+
+  async search(keyword) {
+    try {
+      let searchResponse = await api.request({
+        url: 'items/search',
+        data: {
+          keyword: keyword
+        }
+      });
+      let searchItems = searchResponse.data.data;
+      this.searchItems = searchItems;
+      this.$apply();
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
+    }
+  }
+
+  async getShop() {
+    try {
+      let shopResponse = await api.request({
+        url: 'shops/1'
+      });
+      this.shop = shopResponse.data;
+      this.$apply();
+    } catch (err) {
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
+    }
+  }
+
+  async getWeappSettings() {
+    try {
+      let settingsResponse = await api.request({
+        url: 'settings/weapp'
+      });
+      this.weappSettings = settingsResponse.data;
+      this.$apply();
+    } catch (err) {
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
+    }
+  }
+
+  setSwiper() {
+    this.swiperImages = this.weappSettings.SWIPER_IMAGES.split(',');
+    this.$apply();
+  }
+
+  async onLoad() {
+    this.getHotItems();
+    this.getItems();
+    this.getShop();
+    await this.getWeappSettings();
+    this.setSwiper();
+  }
+  
+  onShareAppMessage(res) {
+    return {
+      // 标题是话题标题
+      title: this.weappSettings.WEAPP_NAME,
+      // 路径为话题详情路径
+      path: '/pages/items',
+      success: function(res) {
+        // 转发成功
+        console.log(res);
+      },
+      fail: function(res) {
+        // 转发失败
+        console.log(res);
+      }
+    };
+  }
+  methods = {
+    showInput() {
+      this.inputShowed = true;
+      this.isSearch = true;
+    },
+    hideInput() {
+      this.inputVal = '';
+      this.inputShowed = false;
+      this.isSearch = false;
+      this.searchItems = [];
+    },
+    clearInput() {
+      this.inputVal = '';
+      this.searchItems = [];
+    },
+    inputTyping(e) {
+      if (e.detail.cursor == e.detail.value.length) {
+        this.inputVal = e.detail.value;
+        this.search(this.inputVal);
+      }
+    },
+    callUs() {
+      wx.makePhoneCall({
+        phoneNumber: this.shop.telephone
+      });
+    },
+    navigation() {
+      let _this = this;
+      wx.getLocation({
+        type: 'gcj02',
+        success: function(res) {
+          var latitude = res.latitude;
+          var longitude = res.longitude;
+          wx.openLocation({
+            latitude: latitude,
+            longitude: longitude,
+            name: _this.weappSettings.COMPANY_NAME,
+            address:
+              _this.shop.province +
+              _this.shop.city +
+              _this.shop.district +
+              _this.shop.address,
+            scale: 18
+          });
+        }
+      });
+    }
+  };
+}
 </script>
