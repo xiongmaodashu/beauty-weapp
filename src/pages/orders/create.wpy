@@ -2,8 +2,11 @@
 .weui-cells::before, .weui-cells::after {
     border: none;
 }
-.weui-cells_after-title {
-    background: #f5f5f5;
+
+.order-items {
+    width: 90%;
+    background: #ffffff;
+    margin: 0 auto;
 }
 .orderable_date {
     width:100px;
@@ -69,16 +72,18 @@
 
 <template>
 <view class="page">
-    <view class="weui-cells__title">预约项目
-        <text wx:if="{{ errors.item_id }}" class="weui-cells__tips error-message">{{ errors.item_id }}</text>
-    </view>
-    <view class="weui-cells weui-cells_after-title">
-        <view class="weui-cell__hd">
-            <picker @change="chooseItem" value="{{itemIndex}}" range="{{orderableItems}}" range-key="name">
-                <view class="weui-select">{{orderableItems[itemIndex].name}}</view>
-            </picker>
+    <viem class="order-items">
+        <view class="weui-cells__title">预约项目
+            <text wx:if="{{ errors.item_id }}" class="weui-cells__tips error-message">{{ errors.item_id }}</text>
         </view>
-    </view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell__hd">
+                <picker @change="chooseItem" value="{{itemIndex}}" range="{{orderableItems}}" range-key="name">
+                    <view class="weui-select">{{orderableItems[itemIndex].name}}</view>
+                </picker>
+            </view>
+        </view>
+    </viem>
     <view class="weui-cells__title">预约日期
         <text wx:if="{{ errors.order_date }}" class="weui-cells__tips error-message">{{ errors.order_date }}</text>
     </view>
