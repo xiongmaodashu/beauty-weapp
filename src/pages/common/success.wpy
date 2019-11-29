@@ -1,46 +1,62 @@
 <style lang="less">
+.weui-msg {
+  padding: 36px 0;
+  text-align: center;
+  width: 90%;
+  margin: 30rpx auto;
+  background: #ffffff;
+  box-shadow: 2rpx 2rpx 12rpx #eeeeee;
+}
+.weui-footer__links {
+    padding: 10rpx 0;
+}
+.weui-footer__link {
+    color: #ea889f;
+}
+.weui-footer__text {
+    color: #282828;
+}
 .success-icon {
-    text-align: center;
+  text-align: center;
 }
 .success-icon image {
-    width: 186rpx;
-    height: 186rpx;
+  width: 186rpx;
+  height: 186rpx;
 }
 .success-info {
-    margin-top: 40rpx;
+  margin-top: 40rpx;
 }
 .success-info-title {
-    font-size: 42rpx;
+  font-size: 42rpx;
 }
 .success-info-desc {
-    font-size: 28rpx;
-    margin-top: 24rpx;
+  font-size: 28rpx;
+  margin-top: 24rpx;
 }
 .success-msg-btn {
-    margin-top: 100rpx;
+  margin-top: 100rpx;
 }
 .message-btn {
-    display: block;
-    text-align: center;
-    width: 75%;
-    margin: 0 auto;
-    height: 72rpx;
-    line-height: 72rpx;
-    padding: 10rpx;
-    border-radius: 10rpx;
-    margin-bottom: 30rpx; 
+  display: block;
+  text-align: center;
+  width: 75%;
+  margin: 0 auto;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 10rpx;
+  border-radius: 10rpx;
+  margin-bottom: 30rpx;
 }
 .msg-btn-success {
-    background: #ea889f;
-    border: 1px solid #ea889f;
-    color: #f7f6f3;
+  background: #ea889f;
+  border: 1px solid #ea889f;
+  color: #f7f6f3;
 }
 .msg-btn-default {
-    background: #282828;
-    border: 1px solid #282828;
-    color: #f7f6f3;
+  background: #282828;
+  border: 1px solid #282828;
+  color: #f7f6f3;
 }
-
 </style>
 
 <template>
@@ -72,68 +88,73 @@
 </template>
 
 <script>
-import wepy from 'wepy'
+import wepy from 'wepy';
 
 export default class CommonSuccess extends wepy.page {
-    data = {
-        message_title: null,
-        message_desc: null,
-        action1_name: null,
-        action1_url: null,
-        action2_name: null,
-        action2_url: null,
-        footer_text: '返回首页',
+  config = {
+    navigationBarTitleText: '成功'
+  };
+  data = {
+    message_title: null,
+    message_desc: null,
+    action1_name: null,
+    action1_url: null,
+    action2_name: null,
+    action2_url: null,
+    footer_text: '返回首页'
+  };
+  message(type) {
+    switch (type) {
+      case 'create_order':
+        this.message_title = '预约成功';
+        this.message_desc = '请您安排好时间，提前到店确认，享受我们的服务。';
+        this.action1_name = '继续预约';
+        this.action1_url = '/pages/orders/create?shop_id=1';
+        this.action2_name = '查看订单';
+        this.action2_url = '/pages/users/orders';
+        this.$apply();
+        break;
+      case 'update_order':
+        this.message_title = '修改成功';
+        this.message_desc = '请您安排好时间，提前到店确认，享受我们的服务。';
+        this.action1_name = '继续预约';
+        this.action1_url = '/pages/orders/create?shop_id=1';
+        this.action2_name = '查看订单';
+        this.action2_url = '/pages/users/orders';
+        this.$apply();
+        break;
+      case 'pay':
+        this.message_title = '支付成功';
+        this.message_desc = '感谢您的支持，欢迎再次光临。';
+        this.action1_name = '继续预约';
+        this.action1_url = '/pages/orders/create';
+        this.action2_name = '查看订单';
+        this.action2_url = '/pages/users/orders';
+        this.$apply();
+        break;
+      default:
+        this.message_title = '成功';
+        this.message_desc = '您的请求已成功处理。';
+        this.action1_name = '返回首页';
+        this.action1_url = '/pages/items/index';
+        this.action2_name = '查看订单';
+        this.action2_url = '/pages/users/orders';
+        this.$apply();
+        break;
     }
-    message(type) {
-        switch (type) {
-            case 'create_order':
-                this.message_title = '预约成功'
-                this.message_desc = '请您安排好时间，提前到店确认，享受我们的服务。'
-                this.action1_name = '继续预约'
-                this.action1_url = '/pages/orders/create?shop_id=1'
-                this.action2_name = '查看订单'
-                this.action2_url = '/pages/users/orders'
-                this.$apply()
-                break;
-            case 'update_order':
-                this.message_title = '修改成功'
-                this.message_desc = '请您安排好时间，提前到店确认，享受我们的服务。'
-                this.action1_name = '继续预约'
-                this.action1_url = '/pages/orders/create?shop_id=1'
-                this.action2_name = '查看订单'
-                this.action2_url = '/pages/users/orders'
-                this.$apply()
-                break
-            case 'pay':
-                this.message_title = '支付成功'
-                this.message_desc = '感谢您的支持，欢迎再次光临。'
-                this.action1_name = '继续预约'
-                this.action1_url = '/pages/orders/create'
-                this.action2_name = '查看订单'
-                this.action2_url = '/pages/users/orders'
-                this.$apply()
-                break
-            default:
-                this.message_title = '成功'
-                this.message_desc = '您的请求已成功处理。'
-                this.action1_name = '返回首页'
-                this.action1_url = '/pages/items/index'
-                this.action2_name = '查看订单'
-                this.action2_url = '/pages/users/orders'
-                this.$apply()
-                break
-
-        }
+  }
+  methods = {
+    backToIndex() {
+      wx.switchTab({
+        url: '/pages/items/index'
+      });
     }
-    methods = {
-        backToIndex() {
-            wx.switchTab({
-                url: '/pages/items/index',
-            })
-        }
-    }
-    onLoad(options) {
-        this.message(options.type)
-    }
+  };
+  onLoad(options) {
+    this.message(options.type),
+      wx.setNavigationBarTitle({
+        title: this.message_title
+      });
+  }
 }
 </script>
