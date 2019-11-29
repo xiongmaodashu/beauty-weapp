@@ -1,28 +1,55 @@
 <style lang="less">
-.weui-navbar__item.weui-bar__item_on {
-    color: #ea889f;
+.weui-search-bar {
+  width: 90%;
+  margin: 0 auto;
+  padding: 16rpx 0;
+  background: #f8f8f8;
+  border: 0;
+  .weui-search-bar__form {
+    border: 0;
+
+    .weui-search-bar__label {
+      border-radius: 20rpx;
+    }
+  }
 }
+
+.item-categories,
+.search-result {
+  width: 90%;
+  margin: 0 auto;
+  background: #ffffff;
+}
+.search-result .weui-tab__panel {
+  padding-top: 0;
+}
+
+.weui-navbar__item.weui-bar__item_on {
+  color: #ea889f;
+}
+
 .category-item-box {
-    display: block;
-    width: 700rpx;
-    height: 350rpx;
-    margin: 40rpx auto;
-    overflow: hidden;
-    box-shadow: 1px 1px 8px rgba(234,136,159, 0.3);
+  display: block;
+  width: 700rpx;
+  height: 350rpx;
+  margin: 40rpx auto 0 auto;
+  overflow: hidden;
+  // box-shadow: 1px 1px 8px rgba(234, 136, 159, 0.3);
 }
 .category-item-box image {
-    width: 700rpx;
-    height: 350rpx;
+  width: 700rpx;
+  height: 350rpx;
 }
+
 .weui-search-bar__cancel-btn {
-    color: #ea889f;
+  color: #ea889f;
 }
 .item-categories-navbar {
-    width: 100%;
-    height: 100rpx;
-    white-space: nowrap;
-    overflow: hidden;
-    border-bottom: 0;
+  width: 100%;
+  height: 100rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  border-bottom: 0;
 }
 ::-webkit-scrollbar {
   width: 0;
@@ -30,21 +57,21 @@
   color: transparent;
 }
 .tab-item-categories {
-    display: inline-block;
-    width: auto;
-    height: 100rpx;
-    margin-left: 16rpx;
-    box-sizing: border-box;
+  display: inline-block;
+  width: auto;
+  height: 100rpx;
+  margin-left: 16rpx;
+  box-sizing: border-box;
 }
 .item-category {
-    padding: 6rpx 24rpx;
-    box-sizing: border-box;
-    line-height: 56rpx;
+  padding: 6rpx 24rpx;
+  box-sizing: border-box;
+  line-height: 56rpx;
 }
 .weui-bar__item_on .item-category {
-    background: #ea889f;
-    color: #ffffff;
-    border-radius: 10rpx;
+  background: #ea889f;
+  color: #ffffff;
+  border-radius: 10rpx;
 }
 </style>
 
@@ -66,7 +93,7 @@
             </view>
             <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
         </view>
-        <view class="weui-tab" wx:if="{{!isSearch}}">
+        <view class="weui-tab item-categories" wx:if="{{!isSearch}}">
             <scroll-view scroll-x class="weui-navbar item-categories-navbar">
                 <view wx:for="{{tabs}}" wx:key="*this" id="{{index}}" class="weui-navbar__item tab-item-categories {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
                     <view class="weui-navbar__title item-category">{{item}}</view>
@@ -84,188 +111,208 @@
                 </repeat>
             </view>
         </view>
-        <view class="search-result" wx:else>
-            <repeat for="{{searchItems}}" item="item">
-                <navigator class="category-item-box" url="/pages/items/show?id={{ item.id }}">
-                    <image src="{{item.thumbnail}}" mode="widthFix" style="width:720rpx;" />
-                </navigator>
-            </repeat>
+        <view class="weui-tab search-result" wx:else>
+            <view class="weui-tab__panel">
+                <repeat for="{{searchItems}}" item="item">
+                    <navigator class="category-item-box" url="/pages/items/show?id={{ item.id }}">
+                        <image src="{{item.thumbnail}}" mode="widthFix" style="width:720rpx;" />
+                    </navigator>
+                </repeat>
+            </view>
         </view>
     </view>
 </template>
 
 <script>
-import wepy from 'wepy'
-import api from '@/utils/api'
+import wepy from 'wepy';
+import api from '@/utils/api';
 
 export default class ItemCategory extends wepy.page {
-    data = {
-        inputShowed: false,
-        inputVal: '',
-        tabs: [],
-        activeIndex: 0,
-        items: [],
-        categoryId: null,
-        badge: 2,
-        isSearch: false,
-        searchItems: [],
-        itemCategories: null,
-        itemCategoriesId: [],
-        weappSettings: null,
-        hotItems: null,
-        recommandItems: null,
-    }
+  config = {
+    navigationBarTitleText: '项目分类'
+  };
 
-    async getItems() {
-        let params = {}
-        if (this.categoryId) {
-            params.item_category_id = this.categoryId
-        }
-        try {
-            let ItemsResponse = await api.request({
-                url: 'items/category',
-                data: params
-            })
-            let items = ItemsResponse.data.data
-            this.items = items
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
-        }
-    }
+  data = {
+    inputShowed: false,
+    inputVal: '',
+    tabs: [],
+    activeIndex: 0,
+    items: [],
+    categoryId: null,
+    badge: 2,
+    isSearch: false,
+    searchItems: [],
+    itemCategories: null,
+    itemCategoriesId: [],
+    weappSettings: null,
+    hotItems: null,
+    recommandItems: null
+  };
 
-    async getMarkedItems(type) {
-        try {
-            let markedItemsResponse = await api.request({
-                url: 'items/marked_items?type=' + type,
-            });
-            this.items = markedItemsResponse.data.data
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
-        }
+  async getItems() {
+    let params = {};
+    if (this.categoryId) {
+      params.item_category_id = this.categoryId;
     }
+    try {
+      let ItemsResponse = await api.request({
+        url: 'items/category',
+        data: params
+      });
+      let items = ItemsResponse.data.data;
+      this.items = items;
+      this.$apply();
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
+    }
+  }
 
-    async getWeappSettings() {
-        try {
-          let settingsResponse = await api.request({
-            url: 'settings/weapp'
-          })
-          this.weappSettings = settingsResponse.data
-          this.hotItems = settingsResponse.data.ITEM_CATEGORY_TAB_SHOW_HOT
-          this.recommandItems = settingsResponse.data.ITEM_CATEGORY_TAB_SHOW_RECOMMEND
-          this.$apply()
-        } catch (err) {
-          wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-          })
-        }
+  async getMarkedItems(type) {
+    try {
+      let markedItemsResponse = await api.request({
+        url: 'items/marked_items?type=' + type
+      });
+      this.items = markedItemsResponse.data.data;
+      this.$apply();
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
+    }
+  }
+
+  async getWeappSettings() {
+    try {
+      let settingsResponse = await api.request({
+        url: 'settings/weapp'
+      });
+      this.weappSettings = settingsResponse.data;
+      this.hotItems = settingsResponse.data.ITEM_CATEGORY_TAB_SHOW_HOT;
+      this.recommandItems =
+        settingsResponse.data.ITEM_CATEGORY_TAB_SHOW_RECOMMEND;
+      this.$apply();
+    } catch (err) {
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
+    }
+  }
+
+  async init() {
+    await this.getWeappSettings();
+
+    if (this.hotItems === '1') {
+      this.tabs = this.tabs.concat('热门');
+      this.itemCategoriesId = this.itemCategoriesId.concat('hot');
+    }
+    if (this.recommandItems === '1') {
+      this.tabs = this.tabs.concat('推荐');
+      this.itemCategoriesId = this.itemCategoriesId.concat('recommend');
+    }
+    try {
+      let itemCategoriesResponse = await api.request({
+        url: 'items/item_categories'
+      });
+      this.itemCategories = itemCategoriesResponse.data;
+      this.tabs = this.tabs.concat(itemCategoriesResponse.data.name);
+      this.itemCategoriesId = this.itemCategoriesId.concat(
+        itemCategoriesResponse.data.id
+      );
+      this.$apply();
+      if (this.hotItems === '1') {
+        this.getMarkedItems('is_hot');
+      } else if (this.recommandItems === '1') {
+        this.getMarkedItems('is_recommend');
+      } else {
+        this.categoryId = itemCategoriesResponse.data.id[0];
+        this.$apply();
+        this.getItems();
       }
-
-    async init() {
-        await this.getWeappSettings()
-
-        if (this.hotItems === '1') {
-            this.tabs = this.tabs.concat('热门')
-            this.itemCategoriesId = this.itemCategoriesId.concat('hot')
-        }
-        if (this.recommandItems === '1') {
-            this.tabs = this.tabs.concat('推荐')
-            this.itemCategoriesId = this.itemCategoriesId.concat('recommend')
-        }
-        try {
-            let itemCategoriesResponse = await api.request({
-                url: 'items/item_categories',
-            })
-            this.itemCategories = itemCategoriesResponse.data
-            this.tabs = this.tabs.concat(itemCategoriesResponse.data.name)
-            this.itemCategoriesId = this.itemCategoriesId.concat(itemCategoriesResponse.data.id)
-            this.$apply()
-            if (this.hotItems === '1') {
-                this.getMarkedItems('is_hot')
-            } else if (this.recommandItems === '1') {
-                this.getMarkedItems('is_recommend')
-            } else {
-                this.categoryId = itemCategoriesResponse.data.id[0]
-                this.$apply()
-                this.getItems()
-            }
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
-        }
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
+  }
 
-    async search(keyword) {
-        try {
-            let searchResponse = await api.request({
-                url: 'items/search',
-                data: {
-                    keyword: keyword
-                }
-            })
-            let searchItems = searchResponse.data.data
-            this.searchItems = searchItems
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
+  async search(keyword) {
+    try {
+      let searchResponse = await api.request({
+        url: 'items/search',
+        data: {
+          keyword: keyword
         }
+      });
+      let searchItems = searchResponse.data.data;
+      this.searchItems = searchItems;
+      this.$apply();
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
+  }
 
-    methods = {
-        showInput () {
-          this.inputShowed = true
-          this.isSearch = true
-        },
-        hideInput () {
-          this.inputVal = ''
-          this.inputShowed = false
-          this.isSearch = false
-          this.searchItems = []
-        },
-        clearInput () {
-          this.inputVal = ''
-          this.searchItems = []
-        },
-        inputTyping (e) {
-            if (e.detail.cursor == e.detail.value.length) {
-                this.inputVal = e.detail.value
-                this.search(this.inputVal)
-            }
-        },
-        tabClick (e) {
-            this.activeIndex = e.currentTarget.id;
-            this.items = []
-            this.categoryId = this.itemCategoriesId[e.currentTarget.id]
-            if (this.categoryId === 'hot') {
-                this.getMarkedItems('is_hot')
-            } else if (this.categoryId === 'recommend') {
-                this.getMarkedItems('is_recommend')
-            } else {
-                this.getItems()
-            }
-            
-        }
+  methods = {
+    showInput() {
+      this.inputShowed = true;
+      this.isSearch = true;
+    },
+    hideInput() {
+      this.inputVal = '';
+      this.inputShowed = false;
+      this.isSearch = false;
+      this.searchItems = [];
+    },
+    clearInput() {
+      this.inputVal = '';
+      this.searchItems = [];
+    },
+    inputTyping(e) {
+      if (e.detail.cursor == e.detail.value.length) {
+        this.inputVal = e.detail.value;
+        this.search(this.inputVal);
+      }
+    },
+    tabClick(e) {
+      this.activeIndex = e.currentTarget.id;
+      this.items = [];
+      this.categoryId = this.itemCategoriesId[e.currentTarget.id];
+      if (this.categoryId === 'hot') {
+        this.getMarkedItems('is_hot');
+      } else if (this.categoryId === 'recommend') {
+        this.getMarkedItems('is_recommend');
+      } else {
+        this.getItems();
+      }
     }
-    onLoad() {
-        this.init()
-    }
+  };
+  onLoad() {
+    this.init();
+  }
+  onShareAppMessage(res) {
+    return {
+      title: this.weappSettings.WEAPP_NAME,
+      path: '/pages/category',
+      success: function(res) {
+        console.log(res);
+      },
+      fail: function(res) {
+        console.log(res);
+      }
+    };
+  }
 }
 </script>
 
