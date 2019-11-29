@@ -36,12 +36,10 @@ swiper {
   margin: 0 auto;
   padding-top: 30rpx;
 
-  .hot-item-box,
-  .search-result {
+  .hot-item-box {
     width: 700rpx;
     height: 350rpx;
     margin: 30rpx auto 0 auto;
-    // box-shadow: 1px 1px 8px rgba(234,136,159, 0.2);
   }
 }
 
@@ -130,6 +128,23 @@ swiper {
 }
 .weui-search-bar__cancel-btn {
   color: #ea889f;
+}
+.search-result {
+  width: 90%;
+  margin: 0 auto;
+  background: #ffffff;
+  overflow: hidden;
+
+  .search-items {
+    width: 700rpx;
+    height: 350rpx;
+    margin: 30rpx auto 0 auto;
+  }
+
+  navigator {
+    width: 700rpx;
+    height: 350rpx;
+  }
 }
 </style>
 <template>
@@ -229,9 +244,9 @@ swiper {
       </view>
     </view>
   </view>
-  <view wx:else>
+  <view class="search-result" wx:else>
     <repeat for="{{searchItems}}" item="item">
-      <view class="search-result">
+      <view class="search-items">
         <navigator url="/pages/items/show?id={{ item.id }}" class="weui-media-box_appmsg item-content" hover-class="weui-cell_active">
           <image src="{{ item.thumbnail }}" class="item-thumbnail" mode="widthFix" />
         </navigator>
@@ -246,6 +261,10 @@ import wepy from 'wepy';
 import api from '@/utils/api';
 
 export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '首页'
+  };
+  
   data = {
     inputShowed: false,
     inputVal: '',
@@ -366,6 +385,9 @@ export default class Index extends wepy.page {
     this.getShop();
     await this.getWeappSettings();
     this.setSwiper();
+    wx.setNavigationBarTitle({
+      title: this.weappSettings.WEAPP_NAME 
+    })
   }
   
   onShareAppMessage(res) {
