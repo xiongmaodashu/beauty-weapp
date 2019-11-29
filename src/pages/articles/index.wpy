@@ -133,7 +133,8 @@ import api from '@/utils/api';
 
 export default class ArticlesIndex extends wepy.page {
   config = {
-    enablePullDownRefresh: true
+    enablePullDownRefresh: true,
+    navigationBarTitleText: '资讯'
   };
 
   data = {
