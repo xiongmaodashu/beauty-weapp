@@ -1,23 +1,41 @@
 <style lang="less">
-.weui-article__p {
-    font-size: 36rpx;
+.order-info {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 20rpx;
+  background: #ffffff;
+  padding: 30rpx 0;
+
+  .confirm-title {
+    font-size: 28rpx;
+    color: #999999;
+    padding: 10rpx 30rpx;
+  }
+  .confirm-text {
+    font-size: 38rpx;
+    color: #282828;
+    padding: 10rpx 30rpx;
+  }
 }
+
 .item-thumbnail {
-    width: 700rpx;
-    height: 350rpx;
-    overflow: hidden;
+  width: 90%;
+  margin: 0 auto;
+  overflow: hidden;
 }
 .item-thumbnail image {
-    width: 700rpx;
-    height: 350rpx;
+  width: 700rpx;
+  height: 350rpx;
 }
+
 .confirm-btn {
-    width: 600rpx;
-    height: 100rpx;
-    line-height: 100rpx;
-    border-radius: 10rpx;
-    background: #ea889f;
-    color: #f7f6f3;
+  width: 90%;
+  height: 100rpx;
+  line-height: 100rpx;
+  border-radius: 10rpx;
+  background: #ea889f;
+  color: #f7f6f3;
+  margin-top: 32rpx;
 }
 </style>
 <template>
@@ -28,20 +46,24 @@
         <view class="weui-article__p item-thumbnail" mode="widthFix">
             <image src="{{ item.thumbnail }}" />
         </view>
-        <view class="weui-article__p">
-            预约项目：{{ item.name }}
-        </view>
-        <view class="weui-article__p">
-            预约日期：{{ order_date }}
-        </view>
-        <view class="weui-article__p">
-            预约时间：{{ order_time }}
-        </view>
-        <view class="weui-article__p">
-            预约时间：{{ order_time }}
-        </view>
-        <view class="weui-article__p">
-            备注信息：{{ remark }}
+        <view class="order-info">
+            <view class="weui-article__p">
+                <view class="confirm-title">预约项目</view>
+                <view class="confirm-text">{{ item.name }}</view>
+            </view>
+            <view class="weui-article__p">
+                <view class="confirm-title">预约日期：</view>
+                <view class="confirm-text">{{ order_date }}</view>
+            </view>
+            <view class="weui-article__p">
+                <view class="confirm-title">预约时间：</view>
+                <view class="confirm-text">{{ order_time }}</view>
+            </view>
+            <view class="weui-article__p">
+                <view class="confirm-title">备注信息：</view>
+                <view class="confirm-text">{{ remark }}</view>
+            </view>
+            
         </view>
         <view class="weui-article__p">
             <button wx:if="{{ order_id }}" @tap="update" class="confirm-btn">确认修改</button>
@@ -52,116 +74,118 @@
 </template>
 
 <script>
-import wepy from 'wepy'
-import api from '@/utils/api'
+import wepy from 'wepy';
+import api from '@/utils/api';
 
 export default class OrderConfirm extends wepy.page {
-    data = {
-        item: null,
-        shop_id: null,
-        order_date: null,
-        order_time: null,
-        remark: null,
-        order_id: null,
-        error: null,
+  config = {
+    navigationBarTitleText: '预约确认'
+  };
+  data = {
+    item: null,
+    shop_id: null,
+    order_date: null,
+    order_time: null,
+    remark: null,
+    order_id: null,
+    error: null
+  };
+  async getItem(id) {
+    try {
+      let itemResponse = await api.request({
+        url: 'items/' + id
+      });
+      let item = itemResponse.data;
+      this.item = item;
+      this.$apply();
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
-    async getItem(id) {
-        try {
-            let itemResponse = await api.request({
-                url: 'items/' + id,
-            })
-            let item = itemResponse.data
-            this.item = item
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
-        }
-    }
+  }
 
-    async submit() {
-        let params={}
-        params.item_id = this.item.id
-        params.shop_id = this.shop_id
-        params.order_date = this.order_date
-        params.order_time = this.order_time
-        params.remark = this.remark
-        try {
-            let orderResponse = await api.authRequest({
-                url: "orders",
-                method: "post",
-                data: params
-            })
-            if (orderResponse.statusCode === 422) {
-                this.error = orderResponse.data.message
-                this.$apply()
-            }
-            if (orderResponse.statusCode === 201) {
-                wx.redirectTo({
-                    url: '/pages/common/success?type=create_order'
-                })
-            }
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-                title: '提示',
-                content: '服务器错误，请联系管理员'
-            })
-        }
+  async submit() {
+    let params = {};
+    params.item_id = this.item.id;
+    params.shop_id = this.shop_id;
+    params.order_date = this.order_date;
+    params.order_time = this.order_time;
+    params.remark = this.remark;
+    try {
+      let orderResponse = await api.authRequest({
+        url: 'orders',
+        method: 'post',
+        data: params
+      });
+      if (orderResponse.statusCode === 422) {
+        this.error = orderResponse.data.message;
+        this.$apply();
+      }
+      if (orderResponse.statusCode === 201) {
+        wx.redirectTo({
+          url: '/pages/common/success?type=create_order'
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
+  }
 
-    async update() {
-        let params={}
-        params.item_id = this.item.id
-        params.shop_id = this.shop_id
-        params.order_date = this.order_date
-        params.order_time = this.order_time
-        params.remark = this.remark
-        try {
-            let orderResponse = await api.authRequest({
-                url: 'orders/' + this.order_id,
-                method: 'PUT',
-                data: params
-            })
-            if (orderResponse.statusCode === 422) {
-                this.error = orderResponse.data.message
-                this.$apply()
-            }
-            if (orderResponse.statusCode === 201) {
-                wx.redirectTo({
-                    url: '/pages/common/success?type=update_order'
-                })
-            }
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-                title: '提示',
-                content: '服务器错误，请联系管理员'
-            })
-        }
-
+  async update() {
+    let params = {};
+    params.item_id = this.item.id;
+    params.shop_id = this.shop_id;
+    params.order_date = this.order_date;
+    params.order_time = this.order_time;
+    params.remark = this.remark;
+    try {
+      let orderResponse = await api.authRequest({
+        url: 'orders/' + this.order_id,
+        method: 'PUT',
+        data: params
+      });
+      if (orderResponse.statusCode === 422) {
+        this.error = orderResponse.data.message;
+        this.$apply();
+      }
+      if (orderResponse.statusCode === 201) {
+        wx.redirectTo({
+          url: '/pages/common/success?type=update_order'
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
+  }
 
-    onLoad(options) {
-        this.getItem(options.item_id)
-        this.order_date = options.order_date
-        this.order_time = options.order_time
-        this.remark = options.remark
-        this.shop_id = options.shop_id
-        this.order_id = options.order_id
-    }
+  onLoad(options) {
+    this.getItem(options.item_id);
+    this.order_date = options.order_date;
+    this.order_time = options.order_time;
+    this.remark = options.remark;
+    this.shop_id = options.shop_id;
+    this.order_id = options.order_id;
+  }
 
-    async onShow() {
-        let user = await this.$parent.getCurrentUser(true)
-        console.log(user)
-        if (!user.phone) {
-            wepy.navigateTo({
-                url: '/pages/users/phone'
-            })
-        }
+  async onShow() {
+    let user = await this.$parent.getCurrentUser(true);
+    console.log(user);
+    if (!user.phone) {
+      wepy.navigateTo({
+        url: '/pages/users/phone'
+      });
     }
+  }
 }
 </script>
