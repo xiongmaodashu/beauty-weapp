@@ -1,14 +1,37 @@
 <style lang="less">
-.article {
+.weui-search-bar {
+  width: 90%;
+  margin: 0 auto;
+  padding: 16rpx 0;
+  background: #f8f8f8;
+  border: 0;
+  .weui-search-bar__form {
+    border: 0;
+
+    .weui-search-bar__label {
+      border-radius: 20rpx;
+    }
+  }
+}
+.articles {
+  width: 90%;
+  margin: 0 auto;
+
+  .weui-cells {
+    background: transparent;
+  }
+
+  .article {
     display: block;
     padding: 40rpx 20px;
-    border-bottom: 1px solid #dfdfdf;
-}
-.article-title {
+    background: #ffffff;
+    margin-bottom: 20rpx;
+  }
+  .article-title {
     line-height: 60rpx;
     overflow: hidden;
-}
-.badge {
+  }
+  .badge {
     width: auto;
     height: 56rpx;
     line-height: 54rpx;
@@ -19,25 +42,33 @@
     display: inline-block;
     font-size: 32rpx;
     margin-right: 20rpx;
-}
-.article-title-text {
+  }
+  .article-title-text {
     display: inline-block;
-}
-.article-date, .article-category {
+  }
+  .article-date,
+  .article-category {
     display: inline-block;
     width: 50%;
     margin-top: 30rpx;
-    font-size:28rpx;
+    font-size: 28rpx;
     color: #aaaaaa;
-}
-.article-date {
+  }
+  .article-date {
     text-align: right;
-}
-.article-category {
+  }
+  .article-category {
     text-align: left;
+  }
 }
+
+.weui-cells::after,
+.weui-cells::before {
+  border: 0;
+}
+
 .weui-loadmore__tips_in-line {
-    background-color: #f5f5f5;
+  background-color: #f8f8f8;
 }
 </style>
 
@@ -60,7 +91,7 @@
                 </view>
                 <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
             </view>
-            <view  wx:if="{{!isSearch}}">
+            <view class="articles"  wx:if="{{!isSearch}}">
                 <view class="weui-cells weui-cells_after-title">
                     <repeat for="{{ articles }}" key="id" index="index" item="article">
                         <navigator url="/pages/articles/show?id={{article.id}}" class="article" hover-class="weui-cell_active">
@@ -76,10 +107,10 @@
                     <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
                 </view>
             </view>
-            <view  wx:else>
+            <view class="articles"  wx:else>
                 <view class="weui-cells weui-cells_after-title">
                     <repeat for="{{ searchArticles }}" key="id" index="index" item="article">
-                        <navigator url="/pages/articles/show?id={{article.id}}" class="article" hover-class="weui-cell_active">
+                        <navigator url="/pages/articles/show?id={{article.id}}" hover-class="weui-cell_active" class="article">
                             <view class="page__title article-title">
                                 <view class="article-title-text"><view class="badge" wx:if="{{article.is_top}}">置顶</view>{{ article.title }}</view>
                             </view>
@@ -97,109 +128,122 @@
 </template>
 
 <script>
-import wepy from 'wepy'
-import api from '@/utils/api'
+import wepy from 'wepy';
+import api from '@/utils/api';
 
 export default class ArticlesIndex extends wepy.page {
-    config = {
-      enablePullDownRefresh: true
-    }
+  config = {
+    enablePullDownRefresh: true
+  };
 
-    data = {
-        articles: [],
-        noMoreData: false,
-        page: 1,
-        inputShowed: false,
-        inputVal: '',
-        isSearch: false,
-        searchArticles: []
-    }
+  data = {
+    articles: [],
+    noMoreData: false,
+    page: 1,
+    inputShowed: false,
+    inputVal: '',
+    isSearch: false,
+    searchArticles: []
+  };
 
-    async getArticles(page = 1, reset = false) {
-        let params = {}
-        params.page = page
-        params.include = 'article_category'
-        try {
-            let articlesResponse = await api.request({
-                url: 'articles',
-                data: params
-            })
-            let articles = articlesResponse.data.data
-            this.articles = reset ? articles : this.articles.concat(articles)
-            let pagination = articlesResponse.data.meta.pagination
-            if (pagination.current_page === pagination.total_pages) {
-                this.noMoreData = true
-            }
-            this.$apply()
-        } catch (err) {
-            wepy.showModal({
-                title: '提示',
-                content: '服务器错误，请联系管理员'
-            })
-        }
-    }
-
-    async search(keyword) {
-        try {
-            let searchResponse = await api.request({
-                url: 'articles/search',
-                data: {
-                    keyword: keyword
-                }
-            })
-            let searchArticles = searchResponse.data.data
-            this.searchArticles = searchArticles
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
-        }
-    }
-
-    async onPullDownRefresh() {
-      this.noMoreData = false
-      this.page = 1
-      await this.getArticles(1, true)
-      wepy.stopPullDownRefresh()
-    }
-
-    async onReachBottom () {
-      if (this.noMoreData) {
-        return
+  async getArticles(page = 1, reset = false) {
+    let params = {};
+    params.page = page;
+    params.include = 'article_category';
+    try {
+      let articlesResponse = await api.request({
+        url: 'articles',
+        data: params
+      });
+      let articles = articlesResponse.data.data;
+      this.articles = reset ? articles : this.articles.concat(articles);
+      let pagination = articlesResponse.data.meta.pagination;
+      if (pagination.current_page === pagination.total_pages) {
+        this.noMoreData = true;
       }
-      this.page = this.page + 1
-      await this.getArticles(this.page)
-      this.$apply()
+      this.$apply();
+    } catch (err) {
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
+  }
 
-    methods = {
-        showInput () {
-          this.inputShowed = true
-          this.isSearch = true
-        },
-        hideInput () {
-          this.inputVal = ''
-          this.inputShowed = false
-          this.isSearch = false
-          this.searchArticles = []
-        },
-        clearInput () {
-          this.inputVal = ''
-          this.searchArticles = []
-        },
-        inputTyping (e) {
-          if (e.detail.cursor == e.detail.value.length) {
-              this.inputVal = e.detail.value
-              this.search(this.inputVal)
-          }
-        },
+  async search(keyword) {
+    try {
+      let searchResponse = await api.request({
+        url: 'articles/search',
+        data: {
+          keyword: keyword
+        }
+      });
+      let searchArticles = searchResponse.data.data;
+      this.searchArticles = searchArticles;
+      this.$apply();
+    } catch (err) {
+      console.log(err);
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      });
     }
+  }
 
-    onLoad(){
-        this.getArticles(1)
+  async onPullDownRefresh() {
+    this.noMoreData = false;
+    this.page = 1;
+    await this.getArticles(1, true);
+    wepy.stopPullDownRefresh();
+  }
+
+  async onReachBottom() {
+    if (this.noMoreData) {
+      return;
     }
+    this.page = this.page + 1;
+    await this.getArticles(this.page);
+    this.$apply();
+  }
+
+  methods = {
+    showInput() {
+      this.inputShowed = true;
+      this.isSearch = true;
+    },
+    hideInput() {
+      this.inputVal = '';
+      this.inputShowed = false;
+      this.isSearch = false;
+      this.searchArticles = [];
+    },
+    clearInput() {
+      this.inputVal = '';
+      this.searchArticles = [];
+    },
+    inputTyping(e) {
+      if (e.detail.cursor == e.detail.value.length) {
+        this.inputVal = e.detail.value;
+        this.search(this.inputVal);
+      }
+    }
+  };
+
+  onShareAppMessage(res) {
+    return {
+      title: '资讯',
+      path: '/pages/articles/index',
+      success: function(res) {
+        console.log(res);
+      },
+      fail: function(res) {
+        console.log(res);
+      }
+    };
+  };
+
+  onLoad() {
+    this.getArticles(1);
+  }
 }
 </script>
