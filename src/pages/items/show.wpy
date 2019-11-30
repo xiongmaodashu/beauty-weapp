@@ -1,25 +1,32 @@
 <style lang="less">
+.item {
+  width: 90%;
+  margin: 20rpx auto 140rpx auto;
+  background: #ffffff;
+}
 .order-btn {
-    position: fixed;
-    bottom:0;
-    width:100%;
-    height:100rpx;
-    line-height: 100rpx;
-    background-color: #ea889f;
-    color: #f7f6f3;
-    text-align:center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 100rpx;
+  line-height: 100rpx;
+  background-color: #ea889f;
+  color: #f7f6f3;
+  text-align: center;
 }
 </style>
 
 <template>
     <view class="page">
-         <view class="page__hd">
-            <view class="page__title">{{ item.name }}</view>
-        </view>
-        <view class="page__bd">
-            <view class="weui-article">
-                <view class="weui-article__p">
-                  <rich-text nodes="{{ item.description }}"></rich-text>
+        <view class="item">
+            <view class="page__hd">
+                <view class="page__title">{{ item.name }}</view>
+            </view>
+            <view class="page__bd">
+                <view class="weui-article">
+                    <view class="weui-article__p">
+                    <rich-text nodes="{{ item.description }}"></rich-text>
+                    </view>
                 </view>
             </view>
         </view>
@@ -27,37 +34,53 @@
             立即预约
         </navigator>
     </view>
+    
 </template>
+
 <script>
-    import wepy from 'wepy'
-    import api from '@/utils/api'
+import wepy from 'wepy'
+import api from '@/utils/api'
 
 export default class ItemShow extends wepy.page {
-    config = {
-        navigationBarTitleText: '项目详情'
+  config = {
+    navigationBarTitleText: '项目详情'
+  };
+  data = {
+    item: null
+  };
+  async getItem(id) {
+    try {
+      let itemResponse = await api.request({
+        url: 'items/' + id
+      })
+      let item = itemResponse.data
+      this.item = item
+      this.$apply()
+    } catch (err) {
+      console.log(err)
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      })
     }
-    data = {
-        item: null
+  }
+  onShareAppMessage(res) {
+    return {
+      title: this.item.name,
+      path: 'pages/items/show?id' + this.item.id,
+      success: function(res) {
+        console.log(res)
+      },
+      fail: function(res) {
+        console.log(res)
+      }
     }
-    async getItem(id) {
-        try {
-            let itemResponse = await api.request({
-                url: 'items/' + id,
-            })
-            let item = itemResponse.data
-
-            this.item = item
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
-        }
-    }
-    onLoad(options) {
-      this.getItem(options.id)
-    }
+  }
+  async onLoad(options) {
+    await this.getItem(options.id)
+    wx.setNavigationBarTitle({
+      title: this.item.name
+    })
+  }
 }
 </script>
