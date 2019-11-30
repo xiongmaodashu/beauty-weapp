@@ -11,18 +11,39 @@
         padding-bottom: 0;
     }
     .weui-tab__content{
-        padding-top: 60px;
+        padding-top: 120rpx;
         text-align: center;
     }
     .tab-content {
         padding-top:0;
     }
     .tab-content .weui-form-preview {
-        margin-bottom: 8px;
+        margin-bottom: 16rpx;
     }
     .weui-loadmore__tips_in-line {
-        background-color: #f5f5f5;
+        background-color: #f8f8f8;
     }
+    .weui-navbar {
+        border: 0;
+        box-shadow: 0 2rpx 10rpx #dddddd;
+    }
+}
+.weui-tab__panel {
+    width: 90%;
+    margin: 0 auto;
+    padding-top: 110rpx;
+
+    .weui-form-preview::before,.weui-form-preview::after {
+        border: 0;
+    }
+    
+    navigator {
+        width: 98%;
+        margin: 16rpx auto;
+        border-radius: 10rpx;
+        box-shadow: 1rpx 1rpx 12rpx #dddddd;
+    }
+    
 }
 </style>
 <template>
@@ -199,96 +220,100 @@ import wepy from 'wepy'
 import api from '@/utils/api.js'
 
 export default class UserOrders extends wepy.page {
-    data = {
-            tabs: ['全部', '已预约', '待结算', '已完成', '已失效'],
-            activeIndex: 0,
-            orders: [],
-            step: null,
-            status: null,
-            page: 1,
-            noMoreData: false
-    };
+  config = {
+    navigationBarTitleText: '我的订单'
+  };
 
-    async getOrders() {
-        try {
-            let params = {}
-            params.page = this.page
-            if (this.step) {
-                params.step = this.step
-            }
-            if (this.status) {
-                params.status = this.status
-            }
-            params.include = 'shop_item,shop_item.item,shop_item.shop'
-            let ordersResponse = await api.authRequest({
-                url: 'user/orders',
-                data: params
-            })
-            if (ordersResponse.statusCode == 200) {
-                let orders = ordersResponse.data.data
-                this.orders = this.orders.concat(orders)
-                let pagination = ordersResponse.data.meta.pagination
-                if (pagination.current_page === pagination.total_pages) {
-                    this.noMoreData = true
-                }
-                this.$apply()
-            }
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-                title: '提示',
-                content: '服务器错误，请联系管理员'
-            })
-        }
-    }
+  data = {
+    tabs: ['全部', '已预约', '待结算', '已完成', '已失效'],
+    activeIndex: 0,
+    orders: [],
+    step: null,
+    status: null,
+    page: 1,
+    noMoreData: false
+  };
 
-    async onReachBottom () {
-      if (this.noMoreData) {
-        return
+  async getOrders() {
+    try {
+      let params = {}
+      params.page = this.page
+      if (this.step) {
+        params.step = this.step
       }
-      this.page = this.page + 1
-      await this.getOrders()
-      this.$apply()
-    }
-
-    methods = {
-        tabClick (e) {
-            this.activeIndex = e.currentTarget.id
-            this.orders = []
-            this.page = 1
-            this.noMoreData = false
-            switch (this.activeIndex) {
-                case '0':
-                    this.step = null
-                    this.status = null
-                    this.getOrders()
-                    break
-                case '1':
-                    this.step = 1
-                    this.status = null
-                    this.getOrders()
-                    break
-                case '2':
-                    this.step = 5
-                    this.status = null
-                    this.getOrders()
-                    break
-                case '3':
-                    this.step = 7
-                    this.status = null
-                    this.getOrders()
-                    break
-                case '4':
-                    this.step = null
-                    this.status = 1
-                    this.getOrders()
-                    break
-            }
+      if (this.status) {
+        params.status = this.status
+      }
+      params.include = 'shop_item,shop_item.item,shop_item.shop'
+      let ordersResponse = await api.authRequest({
+        url: 'user/orders',
+        data: params
+      })
+      if (ordersResponse.statusCode === 200) {
+        let orders = ordersResponse.data.data
+        this.orders = this.orders.concat(orders)
+        let pagination = ordersResponse.data.meta.pagination
+        if (pagination.current_page === pagination.total_pages) {
+          this.noMoreData = true
         }
+        this.$apply()
+      }
+    } catch (err) {
+      console.log(err)
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      })
     }
+  }
 
-    async onLoad () {
-        this.getOrders()
+  async onReachBottom () {
+    if (this.noMoreData) {
+      return
     }
+    this.page = this.page + 1
+    await this.getOrders()
+    this.$apply()
+  }
+
+  methods = {
+    tabClick (e) {
+      this.activeIndex = e.currentTarget.id
+      this.orders = []
+      this.page = 1
+      this.noMoreData = false
+      switch (this.activeIndex) {
+        case '0':
+          this.step = null
+          this.status = null
+          this.getOrders()
+          break
+        case '1':
+          this.step = 1
+          this.status = null
+          this.getOrders()
+          break
+        case '2':
+          this.step = 5
+          this.status = null
+          this.getOrders()
+          break
+        case '3':
+          this.step = 7
+          this.status = null
+          this.getOrders()
+          break
+        case '4':
+          this.step = null
+          this.status = 1
+          this.getOrders()
+          break
+      }
+    }
+  }
+
+  async onLoad () {
+    this.getOrders()
+  }
 }
 </script>
