@@ -37,60 +37,63 @@ import wepy from 'wepy'
 import api from '@/utils/api'
 
 export default class OrdersPay extends wepy.page {
-    data = {
-        order_id: null,
-        payment_way: null,
-        payment_ways: [
-            {name: '会员卡', value: 'user_card', checked: false},
-        ],
-        error: null
-    }
+  config = {
+    navigationBarTitleText: '会员支付'
+  }
+  data = {
+    order_id: null,
+    payment_way: null,
+    payment_ways: [
+        {name: '会员卡', value: 'user_card', checked: false},
+    ],
+    error: null
+  }
 
-    methods = {
-        choosePaymentWay(e) {
-            this.error = null
-            this.payment_ways.forEach(v => {
-                v.checked = v.value === e.detail.value;
-                 this.payment_way = e.detail.value
-            });
-        },
-        async pay() {
-            if (!this.payment_way) {
-                this.error = '请选择付款方式'
+methods = {
+    choosePaymentWay(e) {
+        this.error = null
+        this.payment_ways.forEach(v => {
+            v.checked = v.value === e.detail.value;
+                this.payment_way = e.detail.value
+        });
+    },
+    async pay() {
+        if (!this.payment_way) {
+            this.error = '请选择付款方式'
+            return false
+        }
+        try {
+            let payResponse = await api.authRequest({
+                url: 'pay/' + this.order_id + '/' + this.payment_way,
+                method: 'POST'
+            })
+            wepy.showLoading({title: '支付中'})
+            if (payResponse.statusCode === 422) {
+                wepy.hideLoading()
+                this.error = payResponse.data.msg
+                this.$apply()
                 return false
             }
-            try {
-                let payResponse = await api.authRequest({
-                    url: 'pay/' + this.order_id + '/' + this.payment_way,
-                    method: 'POST'
-                })
-                wepy.showLoading({title: '支付中'})
-                if (payResponse.statusCode === 422) {
-                    wepy.hideLoading()
-                    this.error = payResponse.data.msg
-                    this.$apply()
-                    return false
-                }
-                if (payResponse.statusCode === 200) {
-                    wepy.hideLoading()
-                    wx.redirectTo({
-                        url: '/pages/common/success?type=pay'
-                    })
-                }
-
-            } catch (err) {
-                console.log(err)
-                wepy.showModal({
-                title: '提示',
-                content: '服务器错误，请联系管理员'
+            if (payResponse.statusCode === 200) {
+                wepy.hideLoading()
+                wx.redirectTo({
+                    url: '/pages/common/success?type=pay'
                 })
             }
-            
-        }
-    }
 
-    onLoad(options) {
-        this.order_id = options.id
+        } catch (err) {
+            console.log(err)
+            wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+            })
+        }
+        
     }
+}
+
+  onLoad(options) {
+    this.order_id = options.id
+  }
 }
 </script>
