@@ -18,6 +18,25 @@
 .weui-loadmore__tips_in-line {
     background-color: #f8f8f8;
 }
+.weui-navbar {
+    border: 0;
+    box-shadow: 0 2rpx 10rpx #dddddd;
+}
+
+.weui-tab__panel {
+    width: 90%;
+    margin: 0 auto;
+    padding-top: 120rpx;
+
+    .weui-cells::before,
+    .weui-cells::after {
+        border: 0;
+    }
+
+    .weui-cells::before {
+        border-top: 1rpx solid #ececec;
+    }
+}
 </style>
 
 <template>
@@ -33,7 +52,9 @@
                     <view class="weui-tab__content tab-content" hidden="{{activeIndex != 0}}">
                         <view class="weui-cells weui-cells_after-title">
                             <repeat for="{{ account_statements }}" key="id" index="index" item="statement">
-                                <navigator url="/pages/accounts/detail?id={{statement.id}}&order_id={{statement.order_id}}&shop_id={{statement.shop_id}}" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                <navigator url="/pages/accounts/detail?id={{statement.id}}&order_id={{statement.order_id}}&shop_id={{statement.shop_id}}" 
+                                class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                    <view>{{ statement.order.shop_item.item.name }}</view>
                                     <view class="weui-cell__bd detail-date">{{ statement.created_date }}</view>
                                     <view wx:if="{{ statement.type === 'recharge'}}" class="weui-cell__bd detail-amount">
                                         +{{ statement.amount }}
@@ -92,75 +113,77 @@ import wepy from 'wepy'
 import api from '@/utils/api'
 
 export default class AccountsStatement extends wepy.page {
-    data = {
-        account_statements: [],
-        tabs: ['全部', '消费', '充值'],
-        activeIndex: 0,
-        type: null,
-        page: 1,
-        noMoreData: false
+  config = {
+    navigationBarTitleText: '交易流水'
+  }
+  data = {
+    account_statements: [],
+    tabs: ['全部', '消费', '充值'],
+    activeIndex: 0,
+    type: null,
+    page: 1,
+    noMoreData: false
+  }
+  async getAccountStatement() {
+    let params = {}
+    params.page = this.page
+    if (this.type) {
+      params.type = this.type
     }
-    async getAccountStatement() {
-        let params = {}
-        params.page = this.page
-        if (this.type) {
-            params.type = this.type
-        }
-        try {
-            let accountStatementResponse = await api.authRequest({
-                url: 'accounts/statement',
-                data: params
-            })
-            let account_statements = accountStatementResponse.data.data
-            this.account_statements = this.account_statements.concat(account_statements)
-            let pagination = accountStatementResponse.data.meta.pagination
-            if (pagination.current_page === pagination.total_pages) {
-                this.noMoreData = true
-            }
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-            title: '提示',
-            content: '服务器错误，请联系管理员'
-            })
-        }
-    }
-    methods = {
-        tabClick (e) {
-            this.activeIndex = e.currentTarget.id
-            this.page = 1
-            this.account_statements = []
-            this.noMoreData = false
-            switch (this.activeIndex) {
-                case '0':
-                    this.type = null
-                    this.getAccountStatement()
-                    break
-                case '1':
-                    this.type = 'consume'
-                    this.getAccountStatement()
-                    break
-                case '2':
-                    this.type = 'recharge'
-                    this.getAccountStatement()
-                    break
-            }
-        }
-    }
-
-    async onReachBottom () {
-      if (this.noMoreData) {
-        return
+    try {
+      let accountStatementResponse = await api.authRequest({
+        url: 'accounts/statement',
+        data: params
+      })
+      let accountStatements = accountStatementResponse.data.data
+      this.account_statements = this.account_statements.concat(accountStatements)
+      let pagination = accountStatementResponse.data.meta.pagination
+      if (pagination.current_page === pagination.total_pages) {
+        this.noMoreData = true
       }
-      this.page = this.page + 1
-      await this.getAccountStatement()
       this.$apply()
+    } catch (err) {
+      console.log(err)
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      })
     }
+  }
+  methods = {
+    tabClick (e) {
+      this.activeIndex = e.currentTarget.id
+      this.page = 1
+      this.account_statements = []
+      this.noMoreData = false
+      switch (this.activeIndex) {
+        case '0':
+          this.type = null
+          this.getAccountStatement()
+          break
+        case '1':
+          this.type = 'consume'
+          this.getAccountStatement()
+          break
+        case '2':
+          this.type = 'recharge'
+          this.getAccountStatement()
+          break
+      }
+    }
+  }
 
-    onLoad() {
-        this.getAccountStatement()
+  async onReachBottom () {
+    if (this.noMoreData) {
+      return
     }
+    this.page = this.page + 1
+    await this.getAccountStatement()
+    this.$apply()
+  }
+
+  onLoad() {
+    this.getAccountStatement()
+  }
 }
 </script>
-
