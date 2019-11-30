@@ -1,4 +1,14 @@
 <style lang="less">
+.weui-form-preview {
+    width: 90%;
+    margin: 20rpx auto;
+    background: #ffffff;
+    box-shadow: 2rpx 2rpx 12rpx #dddddd;
+}
+.weui-form-preview::before, 
+.weui-form-preview::after {
+    border: 0;
+}
 .weui-form-preview__label, .weui-form-preview__value {
     font-size: 32rpx;
 }
@@ -61,39 +71,42 @@ import wepy from 'wepy'
 import api from '@/utils/api'
 
 export default class AccountDetail extends wepy.page {
-    data = {
-        account_detail: null,
-        include_item: null
-    }
-    async getAccountDetail(id, order_id, shop_id) {
-        let include_items = []
-        if (order_id != 'null') {
-            include_items.push('order.shop_item.item')
-        } 
-        if (shop_id != 'null') {
-            include_items.push('shop')
-        } 
-        this.include_item = include_items.join(',')
-        try {
-            let accountDetailResponse = await api.authRequest({
-                url: 'accounts/' + id,
-                data: {
-                    include: this.include_item
-                }
-            })
-            this.account_detail = accountDetailResponse.data
-            this.$apply()
-        } catch (err) {
-            console.log(err)
-            wepy.showModal({
-                title: '提示',
-                content: '服务器错误，请联系管理员'
-            })
+  config = {
+      navigationBarTitleText: '交易详情'
+  };
+  data = {
+    account_detail: null,
+    include_item: null
+  };
+  async getAccountDetail(id, order_id, shop_id) {
+    let include_items = []
+    if (order_id != 'null') {
+      include_items.push('order.shop_item.item')
+    } 
+    if (shop_id != 'null') {
+      include_items.push('shop')
+    } 
+    this.include_item = include_items.join(',')
+    try {
+      let accountDetailResponse = await api.authRequest({
+        url: 'accounts/' + id,
+        data: {
+            include: this.include_item
         }
+      })
+      this.account_detail = accountDetailResponse.data
+      this.$apply()
+    } catch (err) {
+      console.log(err)
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      })
     }
-    onLoad(options) {
-        this.getAccountDetail(options.id, options.order_id, options.shop_id)
-    }
+  }
+  onLoad(options) {
+    this.getAccountDetail(options.id, options.order_id, options.shop_id)
+  }
 }
 </script>
 
