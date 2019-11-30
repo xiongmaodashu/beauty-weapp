@@ -1,4 +1,13 @@
 <style>
+.weui-form-preview {
+    width: 90%;
+    margin: 20rpx auto;
+    background: #ffffff;
+}
+.weui-form-preview::before,
+.weui-form-preview::after {
+    border: 0;
+}
 .weui-form-preview__label, .weui-form-preview__value {
     font-size: 32rpx;
 }
@@ -27,6 +36,7 @@
     height: 200rpx;
     margin: 0 auto;
     margin-top: 30px;
+    margin-left: -30rpx;
 }
 .order-number-barcode canvas {
     width: 680rpx;
@@ -121,6 +131,9 @@ import util from '@/utils/util'
 import wxbarcode from 'wxbarcode' 
 
 export default class OrdersShow extends wepy.page {
+    config = {
+        navigationBarTitleText: '订单详情'
+    }
     data = {
         order: null,
         remain: null,
