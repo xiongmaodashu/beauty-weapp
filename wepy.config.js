@@ -46,6 +46,7 @@ module.exports = {
       config: {
         find: /__BASE_URL__/g,
         replace: prod ? "'https://beauty.huzhouyuwei.com/api'" : "'http://beauty.test/api'"
+        // replace: prod ? "'https://beauty.huzhouyuwei.com/api'" : "'https://beauty.huzhouyuwei.com/api'"
       }
     }
   },

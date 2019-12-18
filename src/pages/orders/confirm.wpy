@@ -108,12 +108,19 @@ export default class OrderConfirm extends wepy.page {
   }
 
   async submit() {
+    wx.requestSubscribeMessage({
+     tmplIds: ['unXVxRsvo974s5csOux30cSx27-KJvKHPqulCpl3x8k'],
+     success (res) { 
+         console.log('123ok')
+     }
+    })
+    return false
     let params = {};
-    params.item_id = this.item.id;
-    params.shop_id = this.shop_id;
-    params.order_date = this.order_date;
-    params.order_time = this.order_time;
-    params.remark = this.remark;
+    params.item_id = this.item.id
+    params.shop_id = this.shop_id
+    params.order_date = this.order_date
+    params.order_time = this.order_time
+    params.remark = this.remark
     try {
       let orderResponse = await api.authRequest({
         url: 'orders',

@@ -6,7 +6,7 @@
   border: 0;
 }
 .userinfo-header {
-  background: url('http://beauty.test/images/userinfo-bg.png');
+  background: url('http://beauty.huzhouyuwei.com/images/userinfo-bg.png');
   padding: 30rpx 0;
 
   .avatar {
